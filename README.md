@@ -24,7 +24,7 @@
 
 ## Project Requirements
   ``` 
-  npm install -g grunt-cli bower ionic
+  npm install -g grunt-cli bower ionic cordova
   npm install
   bower install
   ```

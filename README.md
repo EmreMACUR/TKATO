@@ -32,87 +32,102 @@
 ## Workflow Commands
    __Add Platforms__
    -----------------
-    ```grunt platform:add:ios
-    grunt platform:add:android```
+   
+  ``` 
+  grunt platform:add:ios
+  grunt platform:add:android
+  ```
+    
   __Add Cordova Plugins (examples)__
   ----------------------------------
-  ```grunt plugin:add:org.apache.cordova.device
-    grunt plugin:add:https://github.com/EddyVerbruggen/cordova-plugin-actionsheet.git
-    grunt plugin:add:org.apache.cordova.splashscreen```
+  
+  ```
+  grunt plugin:add:org.apache.cordova.device
+  grunt plugin:add:https://github.com/EddyVerbruggen/cordova-plugin-actionsheet.git
+  grunt plugin:add:org.apache.cordova.splashscreen
+  ```
+   
   __Add Splashscreen and App Icon__
   ---------------------------------
-    ```ionic resources```
+  
+  ``` 
+  ionic resources
+  ```
+    
   __Start, Emulate, Compile And Build Project__
   ---------------------------------------------
+  
   Compile Project
-  ```grunt serve```
+  ```
+  grunt serve
+  ```
   
   Compile, Start and Show ConsoleLogs Project
   ```
-     grunt serve --consolelogs
+  grunt serve --consolelogs
   ```
   
   Start Project on Web Browser
   ```
-     ionic serve
+  ionic serve
   ```
   
   Start Project on Web Browser and Compare Android - IOS Views
   ```
-     ionic serve --labs
+  ionic serve --labs
   ```
   
   Compile and Start Project on IOS Emulator
   ```
-     grunt emulate:ios
+  grunt emulate:ios
   ```
   
   Compile and Start Project on Android Emulator
   ```
-     grunt emulate:android
+  grunt emulate:android
   ```
   
   Compile, Start and livereload Project on IOS Emulator
   ```
-     grunt emulate:ios --livereload
+  grunt emulate:ios --livereload
   ```
   
   Compile, Start and livereload Project on Android Emulator
   ```
-     grunt emulate:android --livereload
+  grunt emulate:android --livereload
   ```
   
   Compile, Start and Show ConsoleLogs Project on Android Emulator
   ```
-     grunt emulate:android --consolelogs
+  grunt emulate:android --consolelogs
   ```
   
   Compile and Start Project on IOS IPad Emulator
   ```
-     grunt emulate:ios --target=iPad -lc
+  grunt emulate:ios --target=iPad -lc
   ```
   
   Compile and Start Project on IOS iPhone-5s Emulator
   ```
-     grunt emulate:ios --target=iPhone-5s -lc
+  grunt emulate:ios --target=iPhone-5s -lc
   ```
   
   Compress Project
   ```
-     grunt compress
+  grunt compress
   ```
   
   Build Project for IOS Platform
   ```
-     grunt build:ios
+  grunt build:ios
   ```
   
   Build Project for Android Platform
   ```
-     grunt build:android
+  grunt build:android
   ```
   
   Launches the configured "karma" test running framework using PhantomJS
   ```
-     grunt karma
+  grunt karma
   ```

@@ -32,10 +32,10 @@
 ## Workflow Commands
    __Add Platforms__
    -----------------
-    ``` 
+   
     grunt platform:add:ios
     grunt platform:add:android
-    ```
+   
   __Add Cordova Plugins (examples)__
   ----------------------------------
   ```
@@ -45,9 +45,9 @@
    ```
   __Add Splashscreen and App Icon__
   ---------------------------------
-    ``` 
+   
     ionic resources
-    ```
+  
   __Start, Emulate, Compile And Build Project__
   ---------------------------------------------
   Compile Project

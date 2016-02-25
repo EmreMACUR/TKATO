@@ -30,22 +30,22 @@
   ```
 
 ## Workflow Commands
-  - Add Platforms
+  #### Add Platforms
     ``` 
     grunt platform:add:ios
     grunt platform:add:android
     ```
-  - Add Cordova Plugins (examples) 
+  #### Add Cordova Plugins (examples) 
   ```
     grunt plugin:add:org.apache.cordova.device
     grunt plugin:add:https://github.com/EddyVerbruggen/cordova-plugin-actionsheet.git
     grunt plugin:add:org.apache.cordova.splashscreen
    ```
-  - Add Splashscreen and App Icon
+  #### Add Splashscreen and App Icon
     ``` 
     ionic resources
     ```
-  - Start, Emulate, Compile And Build Project
+  #### Start, Emulate, Compile And Build Project
   ```
      grunt serve // Compile Project
      grunt serve --consolelogs // Compile, Start and Show ConsoleLogs Project

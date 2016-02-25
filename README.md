@@ -1,26 +1,26 @@
 ## Project Structure
-  * Gruntfile.js              __Configuration of all Grunt tasks__
-  * package.json              __Dev dependencies and required Cordova plugins__
-  * bower.json                __Lists front-end dependencies__
-  * config.xml                __Global Cordova configuration__
-  * .gitignore                __Best practices for checking in Cordova apps__
-  * resources/                __Scaffolded placeholder Icons and Splashscreens__
+  * Gruntfile.js              >__Configuration of all Grunt tasks__
+  * package.json              >__Dev dependencies and required Cordova plugins__
+  * bower.json                >__Lists front-end dependencies__
+  * config.xml                >__Global Cordova configuration__
+  * .gitignore                >__Best practices for checking in Cordova apps__
+  * resources/                >__Scaffolded placeholder Icons and Splashscreens__
     * ios/
     * android/
   * app/
-    * index.html              __Main Ionic app entry point__
-    * lib/                    __Libraries managed by Bower__
-    * scripts/                __Custom AngularJS Scripts__
-    * styles/                 __Stylesheets__
-    * templates/              __HTML views__
-  * platforms/                __Targeted operating systems__
-  * plugins/                  __Native plugins__
-  * hooks/                    __Cordova lifecycle hooks__
-  * merges/                   __Platform specific overrides__
-  * coverage/                 __Istanbul reports__
-  * test/                     __Unit tests__
+    * index.html              >__Main Ionic app entry point__
+    * lib/                    >__Libraries managed by Bower__
+    * scripts/                >__Custom AngularJS Scripts__
+    * styles/                 >__Stylesheets__
+    * templates/              >__HTML views__
+  * platforms/                >__Targeted operating systems__
+  * plugins/                  >__Native plugins__
+  * hooks/                    >__Cordova lifecycle hooks__
+  * merges/                   >__Platform specific overrides__
+  * coverage/                 >__Istanbul reports__
+  * test/                     >__Unit tests__
     * spec/
-  * www/                      __Copied from app/ to be used by Cordova__
+  * www/                      >__Copied from app/ to be used by Cordova__
 
 ## Project Requirements
   ``` 
@@ -30,26 +30,26 @@
   ```
 
 ## Workflow Commands
-   > Add Platforms 
-   -------------
+   __Add Platforms__
+   -----------------
     ``` 
     grunt platform:add:ios
     grunt platform:add:android
     ```
-  > Add Cordova Plugins (examples)
-  ------------------------------
+  __Add Cordova Plugins (examples)__
+  ----------------------------------
   ```
     grunt plugin:add:org.apache.cordova.device
     grunt plugin:add:https://github.com/EddyVerbruggen/cordova-plugin-actionsheet.git
     grunt plugin:add:org.apache.cordova.splashscreen
    ```
-  > Add Splashscreen and App Icon
-  -----------------------------
+  __Add Splashscreen and App Icon__
+  ---------------------------------
     ``` 
     ionic resources
     ```
-  > Start, Emulate, Compile And Build Project
-  -----------------------------------------
+  __Start, Emulate, Compile And Build Project__
+  ---------------------------------------------
   ```
      grunt serve // Compile Project
      grunt serve --consolelogs // Compile, Start and Show ConsoleLogs Project

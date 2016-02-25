@@ -57,92 +57,63 @@
   __Start, Emulate, Compile And Build Project__
   ---------------------------------------------
   
-  >Compile Project
-  
+  _Compile Project_
   ```
   grunt serve
-  ```
-  
-  >Compile, Start and Show ConsoleLogs Project
-  
+  ```  
+  _Compile, Start and Show ConsoleLogs Project_
   ```
   grunt serve --consolelogs
-  ```
-  
-  >Start Project on Web Browser
-  
+  ```  
+  _Start Project on Web Browser_
   ```
   ionic serve
-  ```
-  
-  >Start Project on Web Browser and Compare Android - IOS Views
-  
+  ```  
+  _Start Project on Web Browser and Compare Android - IOS Views_
   ```
   ionic serve --labs
-  ```
-  
-  >Compile and Start Project on IOS Emulator
-  
+  ```  
+  _Compile and Start Project on IOS Emulator_
   ```
   grunt emulate:ios
-  ```
-  
-  >Compile and Start Project on Android Emulator
-  
+  ```  
+  _Compile and Start Project on Android Emulator_
   ```
   grunt emulate:android
-  ```
-  
-  >Compile, Start and livereload Project on IOS Emulator
-  
+  ```  
+  _Compile, Start and livereload Project on IOS Emulator_
   ```
   grunt emulate:ios --livereload
-  ```
-  
-  >Compile, Start and livereload Project on Android Emulator
-  
+  ```  
+  _Compile, Start and livereload Project on Android Emulator_
   ```
   grunt emulate:android --livereload
-  ```
-  
-  >Compile, Start and Show ConsoleLogs Project on Android Emulator
-  
+  ```  
+  _Compile, Start and Show ConsoleLogs Project on Android Emulator_
   ```
   grunt emulate:android --consolelogs
-  ```
-  
-  >Compile and Start Project on IOS IPad Emulator
-  
+  ```  
+  _Compile and Start Project on IOS IPad Emulator_
   ```
   grunt emulate:ios --target=iPad -lc
-  ```
-  
-  >Compile and Start Project on IOS iPhone-5s Emulator
-  
+  ```  
+  _Compile and Start Project on IOS iPhone-5s Emulator_
   ```
   grunt emulate:ios --target=iPhone-5s -lc
-  ```
-  
-  >Compress Project
-  
+  ```  
+  _Compress Project_
   ```
   grunt compress
-  ```
-  
-  >Build Project for IOS Platform
-  
+  ```  
+  _Build Project for IOS Platform_
   ```
   grunt build:ios
-  ```
-  
-  >Build Project for Android Platform
-  
+  ```  
+  _Build Project for Android Platform_
   ```
   grunt build:android
-  ```
-  
-  >Launches the configured "karma" test running framework using PhantomJS
-  
+  ```  
+  _Launches the configured "karma" test running framework using PhantomJS_
   ```
   grunt karma
   ```

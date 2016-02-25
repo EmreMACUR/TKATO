@@ -1,51 +1,51 @@
-## > Project Structure
-  - Gruntfile.js            * Configuration of all Grunt tasks
-  - package.json            * Dev dependencies and required Cordova plugins
-  - bower.json              * Lists front-end dependencies
-  - config.xml              * Global Cordova configuration
-  - .gitignore              * Best practices for checking in Cordova apps
-  - resources/              * Scaffolded placeholder Icons and Splashscreens
-  - - ios/
-  - - android/
-  - app/
-  - - index.html          * Main Ionic app entry point
-  - - lib/                * Libraries managed by Bower
-  - - scripts/            * Custom AngularJS Scripts
-  - - styles/             * Stylesheets
-  - -- templates/          * HTML views
-  - platforms/              ** Targeted operating systems
-  - plugins/                * Native plugins
-  - hooks/                  * Cordova lifecycle hooks
-  - merges/                 * Platform specific overrides
-  - coverage/               * Istanbul reports
-  - test/                   * Unit tests
-  - - spec/
-  - www/                    * Copied from app/ to be used by Cordova
+## Project Structure
+  +-- Gruntfile.js            * Configuration of all Grunt tasks
+  +-- package.json            * Dev dependencies and required Cordova plugins
+  +-- bower.json              * Lists front-end dependencies
+  +-- config.xml              * Global Cordova configuration
+  +-- .gitignore              * Best practices for checking in Cordova apps
+  +-- resources/              * Scaffolded placeholder Icons and Splashscreens
+  |   +-- ios/
+  |   +-- android/
+  +-- app/
+  |   +-- index.html          * Main Ionic app entry point
+  |   +-- lib/                * Libraries managed by Bower
+  |   +-- scripts/            * Custom AngularJS Scripts
+  |   +-- styles/             * Stylesheets
+  |   +-- templates/          * HTML views
+  +-- platforms/              ** Targeted operating systems
+  +-- plugins/                * Native plugins
+  +-- hooks/                  * Cordova lifecycle hooks
+  +-- merges/                 * Platform specific overrides
+  +-- coverage/               * Istanbul reports
+  +-- test/                   * Unit tests
+  |   +-- spec/
+  +-- www/                    * Copied from app/ to be used by Cordova
 
-## > Project Requirements
+## Project Requirements
   ``` 
   npm install -g grunt-cli bower ionic
   npm install
   bower install
   ```
 
-## > Workflow Commands
-  ###### > Add Platforms
+## Workflow Commands
+  > Add Platforms
     ``` 
     grunt platform:add:ios
     grunt platform:add:android
     ```
-  ###### > Add Cordova Plugins (examples)
+  > Add Cordova Plugins (examples)
   ```
     grunt plugin:add:org.apache.cordova.device
     grunt plugin:add:https://github.com/EddyVerbruggen/cordova-plugin-actionsheet.git
     grunt plugin:add:org.apache.cordova.splashscreen
    ```
-  ###### > Add Splashscreen and App Icon
+  > Add Splashscreen and App Icon
     ``` 
     ionic resources
     ```
-  ###### > Start, Emulate, Compile And Build Project
+  > Start, Emulate, Compile And Build Project
   ```
      grunt serve // Compile Project
      grunt serve --consolelogs // Compile, Start and Show ConsoleLogs Project

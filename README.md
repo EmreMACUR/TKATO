@@ -57,77 +57,77 @@
   __Start, Emulate, Compile And Build Project__
   ---------------------------------------------
   
-  Compile Project
+  >Compile Project
   ```
   grunt serve
   ```
   
-  Compile, Start and Show ConsoleLogs Project
+  >Compile, Start and Show ConsoleLogs Project
   ```
   grunt serve --consolelogs
   ```
   
-  Start Project on Web Browser
+  >Start Project on Web Browser
   ```
   ionic serve
   ```
   
-  Start Project on Web Browser and Compare Android - IOS Views
+  >Start Project on Web Browser and Compare Android - IOS Views
   ```
   ionic serve --labs
   ```
   
-  Compile and Start Project on IOS Emulator
+  >Compile and Start Project on IOS Emulator
   ```
   grunt emulate:ios
   ```
   
-  Compile and Start Project on Android Emulator
+  >Compile and Start Project on Android Emulator
   ```
   grunt emulate:android
   ```
   
-  Compile, Start and livereload Project on IOS Emulator
+  >Compile, Start and livereload Project on IOS Emulator
   ```
   grunt emulate:ios --livereload
   ```
   
-  Compile, Start and livereload Project on Android Emulator
+  >Compile, Start and livereload Project on Android Emulator
   ```
   grunt emulate:android --livereload
   ```
   
-  Compile, Start and Show ConsoleLogs Project on Android Emulator
+  >Compile, Start and Show ConsoleLogs Project on Android Emulator
   ```
   grunt emulate:android --consolelogs
   ```
   
-  Compile and Start Project on IOS IPad Emulator
+  >Compile and Start Project on IOS IPad Emulator
   ```
   grunt emulate:ios --target=iPad -lc
   ```
   
-  Compile and Start Project on IOS iPhone-5s Emulator
+  >Compile and Start Project on IOS iPhone-5s Emulator
   ```
   grunt emulate:ios --target=iPhone-5s -lc
   ```
   
-  Compress Project
+  >Compress Project
   ```
   grunt compress
   ```
   
-  Build Project for IOS Platform
+  >Build Project for IOS Platform
   ```
   grunt build:ios
   ```
   
-  Build Project for Android Platform
+  >Build Project for Android Platform
   ```
   grunt build:android
   ```
   
-  Launches the configured "karma" test running framework using PhantomJS
+  >Launches the configured "karma" test running framework using PhantomJS
   ```
   grunt karma
   ```

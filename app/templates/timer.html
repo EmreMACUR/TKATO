@@ -1,0 +1,46 @@
+<ion-modal-view>
+  <ion-header-bar class="bar bar-header bar-light">
+    <h1 class="title">Sms Onayı</h1>
+    <button class="button button-clear button-primary" ng-click="modal.hide();stopTimer(true);">İptal</button>
+  </ion-header-bar>
+  <ion-content class="padding">
+
+    <!-- Here you have the timer itself with the progress and the time on the middle, notice the css addded to align it see style.css -->
+    <div class="progress-wrapper">
+      <div class="progress">
+        {{humanizeDurationTimer(timer,'s')}}
+      </div>
+      <div round-progress max="timeForTimer" current="timer" clockwise="false" color="#ef473a" rounded="true" class="text-center"></div>
+    </div>
+    <!-- Here you have the different states that the buttons take during the process -->
+    <!-- Before starting -->
+    <form ng-submit="smsConfirmed(smsPass)" name="smsForm" ng-if="started && !done">
+      <label class="item item-input">
+        <span class="input-label">Şifre</span>
+        <input type="tel" ng-model="smsPass" mask="9999" clean="true"
+               placeholder="XXXX"
+               ng-minlength="4" ng-maxlength="4">
+      </label>
+      <br/>
+      <button class="button button-energized button-block" type="submit">
+        Doğrula
+      </button>
+    </form>
+    <!-- When it has completed -->
+    <div ng-if="done" class="text-center">
+      <div class="text-center">
+        <i class="ion-checkmark-round bigIcon font-size-40"></i>
+        <br>
+        <h2>Doğrulandı</h2>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <button class="button button-energized button-block" ng-click='modal.hide();stopTimer(true);next(11);'>
+            Devam Et
+          </button>
+        </div>
+      </div>
+    </div>
+  </ion-content>
+</ion-modal-view>

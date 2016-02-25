@@ -1,0 +1,86 @@
+<ion-view view-title="Ayarlar">
+  <ion-content>
+    <div class="item item-divider">
+      Ağ Bilgileri
+    </div>
+    <ul>
+      <ion-toggle ng-model="isOnlineNetwork" toggle-class="toggle-balanced"
+                  ng-disabled="true" ng-checked="isOnlineNetwork">İnternet Erişimi</ion-toggle>
+      <a class="item item-icon-left" href="#" ng-disabled="true">
+        <i class="icon ion-android-wifi"></i>
+        Ağ Tipi
+          <span class="item-note">
+            {{networkType}}
+          </span>
+      </a>
+    </ul>
+    <div class="item item-divider">
+      Veritabanı Bilgileri
+    </div>
+    <ul>
+      <ion-toggle toggle-class="toggle-balanced" ng-disabled="true"
+                  ng-checked="dbInfo.sqlite_plugin">SQLite Erişimi</ion-toggle>
+      <a class="item item-icon-left" href="#" ng-disabled="true">
+        <i class="icon ion-android-cloud-circle"></i>
+        Veritabanı Bağlantısı
+          <span class="item-note">
+            {{dbInfo.adapter}}
+          </span>
+      </a>
+    </ul>
+    <div class="item item-divider">
+      Lokasyon Bilgileri
+    </div>
+    <ul>
+      <a class="item item-icon-left" href="#" ng-disabled="true">
+        <i class="icon ion-android-locate"></i>
+        Enlem
+          <span class="item-note">
+            {{latitude}}
+          </span>
+      </a>
+      <a class="item item-icon-left" href="#" ng-disabled="true">
+        <i class="icon ion-android-locate"></i>
+        Boylam
+          <span class="item-note">
+            {{longitude}}
+          </span>
+      </a>
+    </ul>
+    <div class="item item-divider">
+      Cihaz Bilgileri
+    </div>
+    <ul>
+      <a class="item" href="#" ng-disabled="true">
+        Model
+          <span class="item-note">
+            {{model}}
+          </span>
+      </a>
+      <a class="item" href="#" ng-disabled="true">
+        Platform
+          <span class="item-note">
+            {{platform}}
+          </span>
+      </a>
+      <a class="item" href="#" ng-disabled="true">
+        UUID
+          <span class="item-note">
+            {{uuid}}
+          </span>
+      </a>
+      <a class="item" href="#" ng-disabled="true">
+        İşletim Sistemi Versiyonu
+          <span class="item-note">
+            {{version}}
+          </span>
+      </a>
+      <a class="item" href="#" ng-disabled="true">
+        Uygulama Versiyonu
+          <span class="item-note">
+            {{appVersion}}
+          </span>
+      </a>
+    </ul>
+  </ion-content>
+</ion-view>

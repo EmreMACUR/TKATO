@@ -1,0 +1,26 @@
+<ion-view hide-nav-bar="true">
+  <ion-content class="padding">
+    <div class="list">
+      <img src="images/logo.png" class="logo">
+    </div>
+    <form name="form" ng-submit="login(username, password)"
+          role="form" class="login-form">
+      <div class="card login-card padding">
+        <label class="item item-input login-input item-stacked-label">
+          <span class="input-label">Kullanıcı Adı</span>
+          <input type="text" class="form-control" ng-model="username">
+        </label>
+        <label class="item item-input login-input item-stacked-label">
+          <span class="input-label">Şifre</span>
+          <input type="tel" style="-webkit-text-security:disc" class="form-control" ng-model="password">
+        </label>
+        <div class="login-button">
+          <button type="submit" class="button button-block button-energized">
+            Giriş
+          </button>
+        </div>
+
+      </div>
+    </form>
+  </ion-content>
+</ion-view>

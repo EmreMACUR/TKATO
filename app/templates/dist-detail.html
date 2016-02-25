@@ -1,0 +1,496 @@
+<ion-view view-title="Teslimat Detayı">
+  <ion-nav-buttons side="right">
+    <button class="right button button-clear button-positive" ng-click="isProcessReturn()"
+            ng-if="!isPhase1 && !isPhase2 && !isPhase3 && !isPhase4">
+      Görevi Başa Çek
+    </button>
+    <button class="right button button-clear button-positive" ng-click="isPreviousMissionPhotoGet()"
+            ng-if="isPhase1 && OutsidePhotoCount == 0 && previousObjectId != null">
+      Önceki Görevin Fotoğrafını Kullan
+    </button>
+  </ion-nav-buttons>
+  <ion-content class="content-divider">
+    <div class="item item-divider">
+      <label class="float-left divider-text">Dağıtım Bilgileri</label>
+    </div>
+
+    <ion-list class="background-color-white">
+      <ion-item type="item-text-wrap">
+        <div class="row"
+             ng-repeat="item in dist.WorkOrderDataInfo">
+          <div class="col-33">
+            <label class="color-black item-text-wrap">
+              {{item.Label}} :
+            </label>
+          </div>
+          <div class="col-67">
+            <label class="color-gray item-text-wrap">
+              {{item.Description}}
+            </label>
+          </div>
+        </div>
+      </ion-item>
+    </ion-list>
+
+    <div class="item item-divider">
+      <label class="float-left divider-text">{{phaseDescription}}</label>
+
+      <label class="float-right divider-text" ng-if="isPhase1">
+        {{OutsidePhotoCount}} / {{OutsideMax}}
+      </label>
+      <label class="float-right divider-text" ng-if="isPhase9">
+        {{InsidePhotoCount}} / {{InsideMax}}
+      </label>
+    </div>
+
+    <ion-list class="background-color-white bottom-list">
+      <div ng-if="isPhase1">
+        <button class="button button-energized button-block"
+                type="button" ng-click="takePhoto(1)">
+          Fotoğraf Çek
+        </button>
+      </div>
+
+      <div ng-if="isPhase2">
+        <label class="item item-input item-select">
+          <div class="input-label">
+            Teslimat Statüsü
+          </div>
+          <select ng-model="status"
+                  ng-change="statusChange(status)">
+            <option value="3">Teslim</option>
+            <option value="4">İade</option>
+          </select>
+        </label>
+
+        <br/>
+
+        <button class="button button-energized button-block"
+                type="button" ng-disabled="isStatusChecked"
+                ng-click="next(status)">
+          İleri
+        </button>
+      </div>
+
+      <div ng-if="isPhase3">
+        <label class="item item-input item-select">
+          <div class="input-label">
+            Teslim Statüsü
+          </div>
+          <select ng-model="deliveriedStatus"
+                  ng-options="status as status.Description for status in WorkOrderDataStatus.DeliveryStatusDetails"
+                  ng-change="deliveryStatusChangeItem()">
+            <option value="">Seçiniz</option>
+          </select>
+        </label>
+
+        <br/>
+
+        <button class="button button-energized button-block"
+                type="button" ng-disabled="isDeliveryStatusChecked"
+                ng-click="deliveryStatusChange(deliveriedStatus)">
+          İleri
+        </button>
+      </div>
+
+      <div ng-if="isPhase4">
+        <label class="item item-input item-select">
+          <div class="input-label">
+            İade Statüsü
+          </div>
+          <select ng-model="returnStatus"
+                  ng-options="status as status.Description for status in WorkOrderDataStatus.ReturnStatusDetails"
+                  ng-change="deliveryStatusChangeItem()">
+            <option value="">Seçiniz</option>
+          </select>
+        </label>
+
+        <br/>
+
+        <button class="button button-energized button-block"
+                type="button" ng-disabled="isDeliveryStatusChecked"
+                ng-click="deliveryStatusChange(returnStatus)">
+          İleri
+        </button>
+      </div>
+
+      <div ng-if="isPhase5">
+        <ion-radio ng-model="visitCardChoice" ng-value="'visitCardOk'">Kartvizit var</ion-radio>
+        <ion-radio ng-model="visitCardChoice" ng-value="'visitCardNon'">Kartvizit yok</ion-radio>
+
+        <br/>
+
+        <button class="button button-energized button-block"
+                type="button" ng-click="nextVisitPhase(visitCardChoice)">
+          İleri
+        </button>
+      </div>
+
+      <div ng-if="isPhase6">
+        <form name="receiverForm"
+              ng-submit="receiverInfos(receiverNameSurname, receiverTelNumber, receiverJobDescription)" novalidate>
+          <label class="assertive" ng-show="receiverNameSurname.$error.required">* Ad Soyad alanı zorunludur</label>
+          <label class="assertive" ng-show="receiverNameSurname.$error.minlength">* Ad Soyad alanı en az 2 karakter olmalı</label>
+
+          <label class="assertive" ng-show="receiverTelNumber.$error.required">* Telefon Numarası alanı zorunludur</label>
+          <label class="assertive" ng-show="receiverTelNumber.$error.minlength || receiverTelNumber.$error.maxlength">* Telefon Numarası alanı 10 karakter olmalı</label>
+
+          <label class="assertive" ng-show="receiverJobDescription.$error.required">* Görev alanı zorunludur</label>
+
+          <label class="item item-input item-stacked-label">
+            <span class="input-label">Ad Soyad</span>
+            <input type="text" ng-minlength="2" placeholder="Görüşülen Kişi Ad Soyad"
+                   ng-model="receiverNameSurname" required>
+          </label>
+
+          <label class="item item-input item-stacked-label">
+            <span class="input-label">Telefon Numarası</span>
+            <input type="tel" placeholder="örn. (555) 555 55 55" ng-minlength="10" ng-maxlength="10"
+                   ng-model="receiverTelNumber" mask="9999999999" clean="true" required>
+          </label>
+
+          <label class="item item-input item-stacked-label">
+            <span class="input-label">Görevi</span>
+            <input type="text" placeholder="örn. Sekreter, Muhasebeci, Kendisi, vs.."
+                   ng-model="receiverJobDescription" required>
+          </label>
+
+          <ion-checkbox class="checkbox-energized" name="isReceiverEqualOneself"
+                        ng-checked="receiverEqualOneself(isReceiverEqualOneself)"
+                        ng-model="isReceiverEqualOneself">
+            Görüşülen Kişi İle Firma Yetkilisi Aynı
+          </ion-checkbox>
+
+          <br/>
+
+          <button class="button button-energized button-block"
+                  type="submit">
+            İleri
+          </button>
+        </form>
+      </div>
+
+      <div ng-if="isPhase7">
+        <form name="receiverForm"
+              ng-submit="oneselfInfos(oneselfNameSurname, oneselfTelNumber, oneselfTckn, oneselfEmail)" novalidate>
+          <label class="assertive" ng-show="oneselfNameSurname.$error.required">* Ad Soyad alanı zorunludur</label>
+          <label class="assertive" ng-show="oneselfNameSurname.$error.minlength">* Ad Soyad alanı en az 2 karakter olmalı</label>
+
+          <label class="assertive" ng-show="oneselfTelNumber.$error.required">* Telefon Numarası alanı zorunludur</label>
+          <label class="assertive" ng-show="oneselfTelNumber.$error.minlength || oneselfTelNumber.$error.maxlength">* Telefon Numarası alanı 10 karakter olmalı</label>
+
+          <label class="assertive" ng-show="oneselfTckn.$error.required">* T.C. Kimlik Numarası alanı zorunludur</label>
+          <label class="assertive" ng-show="oneselfTckn.$error.minlength || oneselfTckn.$error.maxlength">* T.C. Kimlik Numarası alanı 11 karakter olmalı</label>
+
+          <label class="assertive" ng-show="oneselfEmail.$error.required">* E-Posta alanı zorunludur</label>
+          <label class="assertive" ng-show="oneselfEmail.$invalid && !oneselfEmail.$pristine">* E-Posta alanı email adresi olmak zorundadır</label>
+
+          <label class="item item-input item-stacked-label">
+            <span class="input-label">Ad Soyad</span>
+            <input type="text" ng-minlength="2" ng-model="oneselfNameSurname"
+                   placeholder="Yetkili Kişi Ad Soyad"
+                   ng-disabled="isReceiverEqualOneself" required>
+          </label>
+
+          <label class="item item-input item-stacked-label">
+            <span class="input-label">Telefon Numarası</span>
+            <input type="tel" placeholder="örn.(555) 555 55 55"
+                   ng-minlength="10" ng-maxlength="10"
+                   ng-model="oneselfTelNumber" mask="9999999999"
+                   ng-disabled="isReceiverEqualOneself" clean="true" required>
+          </label>
+
+          <label class="item item-input item-stacked-label">
+            <span class="input-label">T.C. Kimlik Numarası</span>
+            <input type="tel" ng-minlength="11" ng-maxlength="11"
+                   placeholder="Yetkili Kişi T.C. Kimlik Numarası"
+                   ng-model="oneselfTckn" mask="99999999999" required>
+          </label>
+
+          <label class="item item-input item-stacked-label">
+            <span class="input-label">E-Posta Adresi</span>
+            <input type="email" ng-model="oneselfEmail"
+                   placeholder="Yetkili Kişi E-Posta Adresi" required>
+          </label>
+
+          <br/>
+
+          <button class="button button-energized button-block"
+                  type="submit">
+            İleri
+          </button>
+        </form>
+      </div>
+
+      <div ng-if="isPhase8">
+        <form ng-submit="noVisitCardInfos(staticTelNumber, faxNumber, noVisitCardEmail)"
+              name="noVisitCardForm" novalidate>
+          <label class="assertive" ng-show="staticTelNumber.$error.required">* Firma Sabit Telefonu alanı zorunludur</label>
+          <label class="assertive" ng-show="staticTelNumber.$error.minlength || staticTelNumber.$error.maxlength">* Firma Sabit Telefonu alanı 10 karakter olmalı</label>
+
+          <label class="assertive" ng-show="faxNumber.$error.required">* Fax Numarası alanı zorunludur</label>
+          <label class="assertive" ng-show="faxNumber.$error.minlength || faxNumber.$error.maxlength">* Fax Numarası alanı 10 karakter olmalı</label>
+
+          <label class="assertive" ng-show="noVisitCardEmail.$error.required">* E-Posta alanı zorunludur</label>
+          <label class="assertive" ng-show="noVisitCardEmail.$invalid && !noVisitCardEmail.$pristine">* E-Posta alanı email adresi olmak zorundadır</label>
+
+          <label class="item item-input item-stacked-label">
+            <span class="input-label">Firma Sabit Telefonu</span>
+            <input type="tel" placeholder="örn.(212) 555 55 55" ng-minlength="10" ng-maxlength="10"
+                   ng-model="staticTelNumber" mask="9999999999" clean="true" required>
+          </label>
+
+          <label class="item item-input item-stacked-label">
+            <span class="input-label">Firma Fax Numarası</span>
+            <input type="tel" placeholder="örn.(212) 555 55 55" ng-minlength="10" ng-maxlength="10"
+                   ng-model="faxNumber" mask="9999999999" clean="true" required>
+          </label>
+
+          <label class="item item-input item-stacked-label">
+            <span class="input-label">E-Posta Adresi</span>
+            <input type="email" ng-model="noVisitCardEmail"
+                   placeholder="örn. info@firma.com.tr" required>
+          </label>
+
+          <br/>
+
+          <button class="button button-energized button-block"
+                  type="submit">
+            İleri
+          </button>
+        </form>
+      </div>
+
+      <div ng-if="isPhase9">
+        <button class="button button-energized button-block"
+                type="button" ng-click="takePhoto(2)">
+          Fotoğraf Çek
+        </button>
+      </div>
+
+      <div ng-if="isPhase10">
+        <button class="button button-energized button-block"
+                type="button" ng-click="sendSms();selectTimer(180);startTimer();modal.show();">
+          Sms Onayı
+        </button>
+      </div>
+
+      <div ng-if="isPhase11">
+        <div class="card" ng-if="dist.FeedbackResult.DeliveryStatusInfos.IsDelivery">
+          <div class="item item-divider">
+            Görüşülen Kişi
+          </div>
+          <div class="item item-text-wrap">
+            <div class="row">
+              <div class="col-33">
+                <label class="color-black item-text-wrap">
+                  Ad Soyad :
+                </label>
+              </div>
+              <div class="col-67">
+                <label class="color-gray item-text-wrap">
+                  {{dist.FeedbackResult.ReceiverInfos.Interviewed.NameSurname}}
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-33">
+                <label class="color-black item-text-wrap">
+                  Tel :
+                </label>
+              </div>
+              <div class="col-67">
+                <label class="color-gray item-text-wrap">
+                  {{dist.FeedbackResult.ReceiverInfos.Interviewed.PhoneNumber}}
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-33">
+                <label class="color-black item-text-wrap">
+                  Görevi :
+                </label>
+              </div>
+              <div class="col-67">
+                <label class="color-gray item-text-wrap">
+                  {{dist.FeedbackResult.ReceiverInfos.Interviewed.JobDescription}}
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" ng-if="dist.FeedbackResult.DeliveryStatusInfos.IsDelivery">
+          <div class="item item-divider">
+            Yetkili Kişi
+          </div>
+          <div class="item item-text-wrap">
+            <div class="row">
+              <div class="col-33">
+                <label class="color-black item-text-wrap">
+                  Ad Soyad :
+                </label>
+              </div>
+              <div class="col-67">
+                <label class="color-gray item-text-wrap">
+                  {{dist.FeedbackResult.ReceiverInfos.Oneself.NameSurname}}
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-33">
+                <label class="color-black item-text-wrap">
+                  Tel :
+                </label>
+              </div>
+              <div class="col-67">
+                <label class="color-gray item-text-wrap">
+                  {{dist.FeedbackResult.ReceiverInfos.Oneself.PhoneNumber}}
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-33">
+                <label class="color-black item-text-wrap">
+                  E-Posta :
+                </label>
+              </div>
+              <div class="col-67">
+                <label class="color-gray item-text-wrap">
+                  {{dist.FeedbackResult.ReceiverInfos.Oneself.Email}}
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-33">
+                <label class="color-black item-text-wrap">
+                  TCKN :
+                </label>
+              </div>
+              <div class="col-67">
+                <label class="color-gray item-text-wrap">
+                  {{dist.FeedbackResult.ReceiverInfos.Oneself.TCKN}}
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card"
+             ng-if="dist.FeedbackResult.ReceiverInfos.NoVisitCard.StaticTelNumber.length && dist.FeedbackResult.DeliveryStatusInfos.IsDelivery">
+          <div class="item item-divider">
+            Firma Bilgileri
+          </div>
+          <div class="item item-text-wrap">
+            <div class="row">
+              <div class="col-33">
+                <label class="color-black item-text-wrap">
+                  Sabit Tel :
+                </label>
+              </div>
+              <div class="col-67">
+                <label class="color-gray item-text-wrap">
+                  {{dist.FeedbackResult.ReceiverInfos.NoVisitCard.StaticTelNumber}}
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-33">
+                <label class="color-black item-text-wrap">
+                  Fax :
+                </label>
+              </div>
+              <div class="col-67">
+                <label class="color-gray item-text-wrap">
+                  {{dist.FeedbackResult.ReceiverInfos.NoVisitCard.FaxNumber}}
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-33">
+                <label class="color-black item-text-wrap">
+                  E-Posta :
+                </label>
+              </div>
+              <div class="col-67">
+                <label class="color-gray item-text-wrap">
+                  {{dist.FeedbackResult.ReceiverInfos.NoVisitCard.Email}}
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="item item-divider">
+            Teslimat Bilgileri
+          </div>
+          <div class="item item-text-wrap">
+            <div class="row">
+              <div class="col-33">
+                <label class="color-black item-text-wrap">
+                  Teslim Statüsü :
+                </label>
+              </div>
+              <div class="col-67">
+                <label class="color-gray item-text-wrap">
+                  {{dist.FeedbackResult.DeliveryStatusInfos.IsDelivery ? "Teslim" : "İade"}}
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-33">
+                <label class="color-black item-text-wrap">
+                  Teslim Açıklaması :
+                </label>
+              </div>
+              <div class="col-67">
+                <label class="color-gray item-text-wrap">
+                  {{dist.FeedbackResult.DeliveryStatusInfos.Description}}
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="item item-divider">
+            Fotoğraf Bilgileri
+          </div>
+          <div class="item item-text-wrap">
+            <div class="row">
+              <div class="col-33">
+                <label class="color-black item-text-wrap">
+                  Mekan Fotoğraf / Adet :
+                </label>
+              </div>
+              <div class="col-67">
+                <label class="color-gray item-text-wrap">
+                  {{dist.FeedbackResult.ImageInfos.OutsideImages.length}} / {{OutsideMax}}
+                </label>
+              </div>
+            </div>
+            <div class="row" ng-if="dist.FeedbackResult.DeliveryStatusInfos.IsDelivery">
+              <div class="col-33">
+                <label class="color-black item-text-wrap">
+                  Döküman Fotoğraf / Adet :
+                </label>
+              </div>
+              <div class="col-67">
+                <label class="color-gray item-text-wrap">
+                  {{dist.FeedbackResult.ImageInfos.InsideImages.length}} / {{InsideMax}}
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <br/>
+
+        <button class="button button-energized button-block"
+                type="button" ng-click="confirmMission()">
+          Görevi Tamamla
+        </button>
+      </div>
+    </ion-list>
+  </ion-content>
+</ion-view>

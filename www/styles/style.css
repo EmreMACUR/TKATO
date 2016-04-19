@@ -134,3 +134,12 @@ form input + i.icon.error {
   width:100%;
   height: 100%;
 }
+
+.has-errors {
+  border-left: 6px solid #cc2511;
+  border-right: 6px solid #cc2511;
+}
+.no-errors {
+  border-left: 6px solid #3d8b3d;
+  border-right: 6px solid #3d8b3d;
+}

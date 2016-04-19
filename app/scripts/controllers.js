@@ -30,7 +30,7 @@ angular.module('starter.controllers', [])
   .controller('DistDetailCtrl', function($scope, $stateParams, $pouchDB, $rootScope,
                                          $ionicLoading, $http, $timeout, $ionicModal,
                                          $cordovaCamera, $cordovaDialogs, $localStorage,
-                                         $cordovaGeolocation, $state, Server) {
+                                         $cordovaGeolocation, $state, Server, ToastService) {
 
     if($rootScope.workingOnMission == null)
     {
@@ -62,6 +62,11 @@ angular.module('starter.controllers', [])
     $scope.oneselfInfos = {};
     $scope.noVisitCardForm = {};
     $scope.done = false;
+    $scope.isNotPhotoBuildingButton = false;
+    $scope.isNotPhotoCompanyButton = false;
+    $scope.isNotPhotoTaxButton = false;
+    $scope.isNotPhotoBusinessCardButton = false;
+    $scope.isNotPhotoSignatureButton = false;
     var mytimeout = null;
     $scope.smsPass = "";
     $scope.lat  = 0;
@@ -82,8 +87,8 @@ angular.module('starter.controllers', [])
     $scope.OutsidePhotoCount = 0;
     $scope.InsidePhotoCount = 0;
     $scope.isReceiverEqualOneself = false;
-    $scope.oneselfNameSurname = "";
-    $scope.oneselfTelNumber = "";
+    $scope.receiverNameSurname = "";
+    $scope.receiverTelNumber = "";
     var jsonDocument = {};
     var imageJsonDocument = {
       "Image": "",
@@ -94,14 +99,15 @@ angular.module('starter.controllers', [])
     };
     var FeedbackResult = {
       "ImageInfos": {
-        "OutsideImages": [],
-        "InsideImages": []
+        "OutsideImages": {"BuildingImages": [], "TaxCertificateImages": [], "CompanySignboards": []},
+        "InsideImages": {"BusinessCardImages": [], "SignatureImages": []}
       },
       "ReceiverInfos": {
         "Interviewed": {
           "NameSurname": null,
           "JobDescription": null,
-          "PhoneNumber": null
+          "PhoneNumber": null,
+          "Email": null
         },
         "Oneself": {
           "NameSurname": null,
@@ -109,10 +115,18 @@ angular.module('starter.controllers', [])
           "Email": null,
           "TCKN": null
         },
+        "Accountancy": {
+          "NameSurname": null,
+          "TCKN": null,
+          "PhoneTelNumber": null,
+          "Email": null
+        },
         "NoVisitCard": {
           "Email": null,
           "StaticTelNumber": null,
-          "FaxNumber": null
+          "FaxNumber": null,
+          "PhoneTelNumber": null,
+          "WebPage": null
         }
       },
       "DeliveryStatusInfos": {
@@ -144,6 +158,7 @@ angular.module('starter.controllers', [])
         $scope.long = position.coords.longitude;
       }, function(err) {
         // error
+        //ToastService.setToastInit("Lokasyon bilgisi alınamadı!", "short", "top");
       });
 
     var confirmShow = function (confirmText) {
@@ -168,6 +183,11 @@ angular.module('starter.controllers', [])
       $scope.isInsideMinPhotoCount = true;
       $scope.isStatusChecked = true;
       $scope.isDeliveryStatusChecked = true;
+      $scope.isNotPhotoBuildingButton = false;
+      $scope.isNotPhotoCompanyButton = false;
+      $scope.isNotPhotoTaxButton = false;
+      $scope.isNotPhotoBusinessCardButton = false;
+      $scope.isNotPhotoSignatureButton = false;
     };
     var phase1 = function() {
       $scope.phaseDescription = "Mekan Fotoğraf Çekimi";
@@ -182,6 +202,7 @@ angular.module('starter.controllers', [])
       $scope.isPhase9 = false;
       $scope.isPhase10 = false;
       $scope.isPhase11 = false;
+      $scope.isPhase12 = false;
     };
     var phase2 = function() {
       $scope.phaseDescription = "Statü Seçimi";
@@ -196,9 +217,10 @@ angular.module('starter.controllers', [])
       $scope.isPhase9 = false;
       $scope.isPhase10 = false;
       $scope.isPhase11 = false;
+      $scope.isPhase12 = false;
     };
     var phase3 = function() {
-      $scope.phaseDescription = "Teslim Statü Seçimi";
+      $scope.phaseDescription = "Güncellendi Statü Seçimi";
       $scope.isPhase1 = false;
       $scope.isPhase2 = false;
       $scope.isPhase3 = true;
@@ -210,9 +232,10 @@ angular.module('starter.controllers', [])
       $scope.isPhase9 = false;
       $scope.isPhase10 = false;
       $scope.isPhase11 = false;
+      $scope.isPhase12 = false;
     };
     var phase4 = function() {
-      $scope.phaseDescription = "İade Statü Seçimi";
+      $scope.phaseDescription = "Güncellenemedi Statü Seçimi";
       $scope.isPhase1 = false;
       $scope.isPhase2 = false;
       $scope.isPhase3 = false;
@@ -224,6 +247,7 @@ angular.module('starter.controllers', [])
       $scope.isPhase9 = false;
       $scope.isPhase10 = false;
       $scope.isPhase11 = false;
+      $scope.isPhase12 = false;
     };
     var phase5 = function() {
       $scope.phaseDescription = "Kartvizit Seçimi";
@@ -238,9 +262,10 @@ angular.module('starter.controllers', [])
       $scope.isPhase9 = false;
       $scope.isPhase10 = false;
       $scope.isPhase11 = false;
+      $scope.isPhase12 = false;
     };
     var phase6 = function() {
-      $scope.phaseDescription = "Görüşülen Kişi Bilgileri";
+      $scope.phaseDescription = "Firma Bilgileri";
       $scope.isPhase1 = false;
       $scope.isPhase2 = false;
       $scope.isPhase3 = false;
@@ -249,12 +274,14 @@ angular.module('starter.controllers', [])
       $scope.isPhase6 = true;
       $scope.isPhase7 = false;
       $scope.isPhase8 = false;
+      $scope.isPhase8 = false;
       $scope.isPhase9 = false;
       $scope.isPhase10 = false;
       $scope.isPhase11 = false;
+      $scope.isPhase12 = false;
     };
     var phase7 = function() {
-      $scope.phaseDescription = "Yetkili Kişi Bilgileri";
+      $scope.phaseDescription = "İmza Yetkili Kişi Bilgileri";
       $scope.isPhase1 = false;
       $scope.isPhase2 = false;
       $scope.isPhase3 = false;
@@ -266,9 +293,10 @@ angular.module('starter.controllers', [])
       $scope.isPhase9 = false;
       $scope.isPhase10 = false;
       $scope.isPhase11 = false;
+      $scope.isPhase12 = false;
     };
     var phase8 = function() {
-      $scope.phaseDescription = "Firma Bilgileri";
+      $scope.phaseDescription = "Muhasebe Yetkili Kişi Bilgileri";
       $scope.isPhase1 = false;
       $scope.isPhase2 = false;
       $scope.isPhase3 = false;
@@ -276,14 +304,14 @@ angular.module('starter.controllers', [])
       $scope.isPhase5 = false;
       $scope.isPhase6 = false;
       $scope.isPhase7 = false;
-      $scope.isPhase8 = false;
       $scope.isPhase8 = true;
       $scope.isPhase9 = false;
       $scope.isPhase10 = false;
       $scope.isPhase11 = false;
+      $scope.isPhase12 = false;
     };
     var phase9 = function() {
-      $scope.phaseDescription = "Döküman Fotoğraf Çekimi";
+      $scope.phaseDescription = "Görüşülen Kişi Bilgileri";
       $scope.isPhase1 = false;
       $scope.isPhase2 = false;
       $scope.isPhase3 = false;
@@ -295,9 +323,10 @@ angular.module('starter.controllers', [])
       $scope.isPhase9 = true;
       $scope.isPhase10 = false;
       $scope.isPhase11 = false;
+      $scope.isPhase12 = false;
     };
     var phase10 = function() {
-      $scope.phaseDescription = "Sms Onayı";
+      $scope.phaseDescription = "Döküman Fotoğraf Çekimi";
       $scope.isPhase1 = false;
       $scope.isPhase2 = false;
       $scope.isPhase3 = false;
@@ -309,9 +338,10 @@ angular.module('starter.controllers', [])
       $scope.isPhase9 = false;
       $scope.isPhase10 = true;
       $scope.isPhase11 = false;
+      $scope.isPhase12 = false;
     };
     var phase11 = function() {
-      $scope.phaseDescription = "Genel Bilgi Gösterimi";
+      $scope.phaseDescription = "Sms Onayı";
       $scope.isPhase1 = false;
       $scope.isPhase2 = false;
       $scope.isPhase3 = false;
@@ -323,6 +353,22 @@ angular.module('starter.controllers', [])
       $scope.isPhase9 = false;
       $scope.isPhase10 = false;
       $scope.isPhase11 = true;
+      $scope.isPhase12 = false;
+    };
+    var phase12 = function() {
+      $scope.phaseDescription = "Genel Bilgi Gösterimi";
+      $scope.isPhase1 = false;
+      $scope.isPhase2 = false;
+      $scope.isPhase3 = false;
+      $scope.isPhase4 = false;
+      $scope.isPhase5 = false;
+      $scope.isPhase6 = false;
+      $scope.isPhase7 = false;
+      $scope.isPhase8 = false;
+      $scope.isPhase9 = false;
+      $scope.isPhase10 = false;
+      $scope.isPhase11 = false;
+      $scope.isPhase12 = true;
     };
     $scope.next = function(phase) {
       if(phase == 1)
@@ -347,6 +393,8 @@ angular.module('starter.controllers', [])
         phase10();
       else if(phase == 11)
         phase11();
+      else if(phase == 12)
+        phase12();
 
     };
 
@@ -367,50 +415,77 @@ angular.module('starter.controllers', [])
         $scope.InsideMin = jsonDocument.PhotoRequirements.Inside.Min;
         $scope.InsideMax = jsonDocument.PhotoRequirements.Inside.Max;
 
-        $scope.OutsidePhotoCount = FeedbackResult.ImageInfos.OutsideImages.length;
-        $scope.InsidePhotoCount = FeedbackResult.ImageInfos.InsideImages.length;
+        $scope.outsideCount = FeedbackResult.ImageInfos.OutsideImages.BuildingImages.length +
+                           FeedbackResult.ImageInfos.OutsideImages.CompanySignboards.length +
+                           FeedbackResult.ImageInfos.OutsideImages.TaxCertificateImages.length;
+        $scope.insideCount = FeedbackResult.ImageInfos.InsideImages.BusinessCardImages.length +
+                          FeedbackResult.ImageInfos.InsideImages.SignatureImages.length;
+        $scope.OutsidePhotoCount = $scope.outsideCount;
+        $scope.InsidePhotoCount = $scope.insideCount;
+
+        if(FeedbackResult.ImageInfos.OutsideImages.BuildingImages.length != 0)
+          $scope.isNotPhotoBuildingButton = true;
+        if(FeedbackResult.ImageInfos.OutsideImages.CompanySignboards.length != 0)
+          $scope.isNotPhotoCompanyButton = true;
+        if(FeedbackResult.ImageInfos.OutsideImages.TaxCertificateImages.length != 0)
+          $scope.isNotPhotoTaxButton = true;
+        if(FeedbackResult.ImageInfos.InsideImages.BusinessCardImages.length != 0)
+          $scope.isNotPhotoBusinessCardButton = true;
+        if(FeedbackResult.ImageInfos.InsideImages.SignatureImages.length != 0)
+          $scope.isNotPhotoSignatureButton = true;
 
         if(!FeedbackResult.SmsConfirmInfos.Description &&
           $scope.InsideMax != $scope.InsidePhotoCount &&
           $scope.InsidePhotoCount != 0 &&
           FeedbackResult.ReceiverInfos.Oneself.NameSurname)
-          phase9();
-
-        if($scope.InsideMax <= $scope.InsidePhotoCount &&
-          !FeedbackResult.SmsConfirmInfos.Description)
           phase10();
 
         if($scope.InsideMax <= $scope.InsidePhotoCount &&
-          FeedbackResult.SmsConfirmInfos.Description)
+          !FeedbackResult.SmsConfirmInfos.Description)
           phase11();
+
+        if($scope.InsideMax <= $scope.InsidePhotoCount &&
+          FeedbackResult.SmsConfirmInfos.Description)
+          phase12();
 
         if($scope.OutsideMax <= $scope.OutsidePhotoCount &&
           FeedbackResult.DeliveryStatusInfos.IsDelivery == false)
-          phase11();
+          phase12();
 
-        if(!FeedbackResult.ReceiverInfos.Interviewed.NameSurname &&
-          FeedbackResult.DeliveryStatusInfos.IsDelivery == true)
+        if(!FeedbackResult.ReceiverInfos.Oneself.NameSurname &&
+          FeedbackResult.DeliveryStatusInfos.IsDelivery == true &&
+          $scope.visitChoice != 'visitCardOk')
+          phase6();
+
+        if(!FeedbackResult.ReceiverInfos.Oneself.NameSurname &&
+          FeedbackResult.DeliveryStatusInfos.IsDelivery == true &&
+          $scope.visitChoice == 'visitCardOk')
+          phase7();
+
+        if(!FeedbackResult.ReceiverInfos.Oneself.NameSurname &&
+          FeedbackResult.DeliveryStatusInfos.IsDelivery == true &&
+          !FeedbackResult.ReceiverInfos.NoVisitCard.NameSurname == true)
           phase5();
 
-        if(FeedbackResult.ReceiverInfos.Interviewed.NameSurname &&
+        if((FeedbackResult.ReceiverInfos.Oneself.NameSurname || FeedbackResult.ReceiverInfos.NoVisitCard.StaticTelNumber) &&
           FeedbackResult.DeliveryStatusInfos.IsDelivery == true && $scope.InsidePhotoCount == 0)
         {
-          if(FeedbackResult.ReceiverInfos.Interviewed.NameSurname &&
-            !FeedbackResult.ReceiverInfos.Oneself.NameSurname)
+          if(FeedbackResult.ReceiverInfos.NoVisitCard.StaticTelNumber &&
+            !FeedbackResult.ReceiverInfos.Oneself.NameSurname &&
+            $scope.visitChoice != 'visitCardOk')
             phase7();
 
           if(FeedbackResult.ReceiverInfos.Oneself.NameSurname &&
-            !FeedbackResult.ReceiverInfos.NoVisitCard.Email &&
-            $scope.visitChoice != 'visitCardOk')
+            !FeedbackResult.ReceiverInfos.Accountancy.NameSurname)
             phase8();
 
-          if(FeedbackResult.ReceiverInfos.NoVisitCard.Email &&
-            $scope.visitChoice != 'visitCardOk' && $scope.InsidePhotoCount == 0)
+          if(FeedbackResult.ReceiverInfos.Accountancy.NameSurname &&
+            !FeedbackResult.ReceiverInfos.Interviewed.NameSurname)
             phase9();
 
-          if(FeedbackResult.ReceiverInfos.Oneself.NameSurname &&
-            $scope.visitChoice == 'visitCardOk' && $scope.InsidePhotoCount == 0)
-            phase9();
+          if(FeedbackResult.ReceiverInfos.Interviewed.NameSurname &&
+            $scope.InsidePhotoCount == 0)
+            phase10();
         }
 
         if($scope.OutsideMax <= $scope.OutsidePhotoCount &&
@@ -423,12 +498,17 @@ angular.module('starter.controllers', [])
       {
         saveDeviceProperties();
         //phase1();
-        FeedbackResult.ImageInfos.OutsideImages = [];
+        FeedbackResult.ImageInfos.OutsideImages.BuildingImages = [];
+        FeedbackResult.ImageInfos.OutsideImages.CompanySignboards = [];
+        FeedbackResult.ImageInfos.OutsideImages.TaxCertificateImages = [];
         $scope.OutsidePhotoCount = 0;
         $scope.InsidePhotoCount = 0;
+        $scope.isNotPhotoBuildingButton = false;
+        $scope.isNotPhotoCompanyButton = false;
+        $scope.isNotPhotoTaxButton = false;
         $scope.isReceiverEqualOneself = false;
-        $scope.oneselfNameSurname = "";
-        $scope.oneselfTelNumber = "";
+        $scope.receiverNameSurname = "";
+        $scope.receiverTelNumber = "";
       }
 
       $scope.isLoading = false;
@@ -443,7 +523,8 @@ angular.module('starter.controllers', [])
       $scope.$apply();
 
     }, function(error) {
-      console.log("ERROR -> " + error);
+      //console.log("ERROR -> " + error);
+      ToastService.setToastInit("Veritabanından bilgi getirilemedi!", "short", "top");
       $ionicLoading.hide();
     });
 
@@ -488,7 +569,7 @@ angular.module('starter.controllers', [])
       $ionicLoading.show();
       $pouchDB.get($localStorage.previousObjectId).then(function(response) {
         $ionicLoading.hide();
-        $scope.previousMissionPhoto = response.FeedbackResult.ImageInfos.OutsideImages[0].Image;
+        $scope.previousMissionPhoto = response.FeedbackResult.ImageInfos.OutsideImages.BuildingImages[0].Image;
 
       }, function(error) {
         $ionicLoading.hide();
@@ -531,16 +612,18 @@ angular.module('starter.controllers', [])
 
     var processReturn = function () {
       $scope.isReceiverEqualOneself = false;
-      $scope.oneselfNameSurname = "";
-      $scope.oneselfTelNumber = "";
+      $scope.receiverNameSurname = "";
+      $scope.receiverTelNumber = "";
       $scope.InsidePhotoCount = 0;
-      FeedbackResult.ImageInfos.InsideImages = [];
+      FeedbackResult.ImageInfos.InsideImages.BusinessCardImages = [];
+      FeedbackResult.ImageInfos.InsideImages.SignatureImages = [];
       FeedbackResult.DeliveryStatusInfos = {"IsDelivery": null, "Id": null, "Description": null};
       FeedbackResult.ReceiverInfos = {
         "Interviewed": {
           "NameSurname": null,
           "JobDescription": null,
-          "PhoneNumber": null
+          "PhoneNumber": null,
+          "Email": null
         },
         "Oneself": {
           "NameSurname": null,
@@ -548,10 +631,18 @@ angular.module('starter.controllers', [])
           "Email": null,
           "TCKN": null
         },
+        "Accountancy": {
+          "NameSurname": null,
+          "TCKN": null,
+          "PhoneTelNumber": null,
+          "Email": null
+        },
         "NoVisitCard": {
           "Email": null,
           "StaticTelNumber": null,
-          "FaxNumber": null
+          "FaxNumber": null,
+          "PhoneTelNumber": null,
+          "WebPage": null
         }
       };
       FeedbackResult.SmsConfirmInfos = { "IsSent": null, "Description": null };
@@ -578,18 +669,18 @@ angular.module('starter.controllers', [])
         saveToPhotoAlbum: false
       };
 
-      if(clickStatus == 1)
+      if(clickStatus == 1 || clickStatus == 2 || clickStatus == 3)
       {
         $cordovaCamera.getPicture(options).then(function (imageData) {
-          saveOutsideImage(imageData);
+          saveOutsideImage(imageData, clickStatus);
         }, function (err) {
 
         });
       }
-      else if(clickStatus == 2)
+      else if(clickStatus == 4 || clickStatus == 5)
       {
         $cordovaCamera.getPicture(options).then(function (imageData) {
-          saveInsideImage(imageData);
+          saveInsideImage(imageData, clickStatus);
         }, function (err) {
 
         });
@@ -605,7 +696,7 @@ angular.module('starter.controllers', [])
       saveDB(FeedbackResult, "", 1);
     };
 
-    var saveOutsideImage = function(imageData) {
+    var saveOutsideImage = function(imageData, photoStatus) {
       var now = new Date();
       imageJsonDocument = {};
       imageJsonDocument.Image = imageData;
@@ -613,18 +704,23 @@ angular.module('starter.controllers', [])
       imageJsonDocument.Lat = $scope.lat;
       imageJsonDocument.Long = $scope.long;
       imageJsonDocument.Accuracy = 0;
-      FeedbackResult.ImageInfos.OutsideImages.push(imageJsonDocument);
+      if(photoStatus == 1)
+        FeedbackResult.ImageInfos.OutsideImages.BuildingImages.push(imageJsonDocument);
+      if(photoStatus == 2)
+        FeedbackResult.ImageInfos.OutsideImages.CompanySignboards.push(imageJsonDocument);
+      if(photoStatus == 3)
+        FeedbackResult.ImageInfos.OutsideImages.TaxCertificateImages.push(imageJsonDocument);
 
       if($scope.OutsideMax == $scope.OutsidePhotoCount+1)
-        saveDB(FeedbackResult, "Dış Fotoğraf Kaydedildi!", 2);
+        saveDB(FeedbackResult, "Mekan Fotoğrafı Kaydedildi!", 2);
       else
-        saveDB(FeedbackResult, "Dış Fotoğraf Kaydedildi!", 1);
+        saveDB(FeedbackResult, "Mekan Fotoğrafı Kaydedildi!", 1);
 
       if($scope.previousMissionPhoto != null)
         $scope.previousMissionPhoto = null;
     };
 
-    var saveInsideImage = function(imageData) {
+    var saveInsideImage = function(imageData, photoStatus) {
       var now = new Date();
       imageJsonDocument = {};
       imageJsonDocument.Image = imageData;
@@ -632,12 +728,15 @@ angular.module('starter.controllers', [])
       imageJsonDocument.Lat = $scope.lat;
       imageJsonDocument.Long = $scope.long;
       imageJsonDocument.Accuracy = 0;
-      FeedbackResult.ImageInfos.InsideImages.push(imageJsonDocument);
+      if(photoStatus == 4)
+        FeedbackResult.ImageInfos.InsideImages.BusinessCardImages.push(imageJsonDocument);
+      if(photoStatus == 5)
+        FeedbackResult.ImageInfos.InsideImages.SignatureImages.push(imageJsonDocument);
 
       if($scope.InsideMax == $scope.InsidePhotoCount+1)
-        saveDB(FeedbackResult, "İç Fotoğraf Kaydedildi!", 10);
+        saveDB(FeedbackResult, "İç Fotoğraf Kaydedildi!", 12);
       else
-        saveDB(FeedbackResult, "İç Fotoğraf Kaydedildi!", 9);
+        saveDB(FeedbackResult, "İç Fotoğraf Kaydedildi!", 11);
     };
 
     var checkTCKN = function(value) {
@@ -662,7 +761,7 @@ angular.module('starter.controllers', [])
     $scope.statusChange = function (status) {
       if(status) {
         $scope.isStatusChecked = false;
-        if(status == 3)
+        if(status == 5)
           $scope.deliveryStatus = true;
         else
           $scope.deliveryStatus = false;
@@ -673,6 +772,18 @@ angular.module('starter.controllers', [])
 
     $scope.deliveryStatusChangeItem = function () {
       $scope.isDeliveryStatusChecked = false;
+    };
+
+    $scope.statusSelected = function (status) {
+
+      if(status == 5) {
+        FeedbackResult.DeliveryStatusInfos.Description = "TESLİM";
+        FeedbackResult.DeliveryStatusInfos.Id = 1;
+        FeedbackResult.DeliveryStatusInfos.IsDelivery = $scope.deliveryStatus;
+        saveDB(FeedbackResult, "Statü kaydedildi!", status);
+      }
+      else
+        $scope.next(status);
     };
 
     $scope.deliveryStatusChange = function (status) {
@@ -695,19 +806,118 @@ angular.module('starter.controllers', [])
     $scope.nextVisitPhase = function (visitChoice) {
       if(visitChoice) {
         $scope.visitChoice = visitChoice;
-        $scope.next(6);
+        if(visitChoice == 'visitCardOk')
+          $scope.next(7);
+        if(visitChoice == 'visitCardNon')
+          $scope.next(6);
       }
       else
         warningShow("Lütfen kartvizit seçiniz!");
     };
 
-    $scope.receiverInfos = function (nameSurname, telNumber, jobDescription) {
-      if(nameSurname.length && telNumber.length && jobDescription.length) {
+    $scope.noVisitCardInfos = function (staticTelNumber, phoneTelNumber, faxNumber, webPage, noVisitCardEmail) {
+      if(staticTelNumber != null || staticTelNumber != undefined || staticTelNumber != "") {
+        FeedbackResult.ReceiverInfos.NoVisitCard.StaticTelNumber = staticTelNumber;
+        if(noVisitCardEmail == null || noVisitCardEmail == undefined || noVisitCardEmail == "")
+          FeedbackResult.ReceiverInfos.NoVisitCard.Email= "";
+        else
+          FeedbackResult.ReceiverInfos.NoVisitCard.Email = noVisitCardEmail;
+
+        if(faxNumber == null || faxNumber == undefined || faxNumber == "")
+          FeedbackResult.ReceiverInfos.NoVisitCard.FaxNumber= "";
+        else
+          FeedbackResult.ReceiverInfos.NoVisitCard.FaxNumber = faxNumber;
+
+        if(phoneTelNumber == null || phoneTelNumber == undefined || phoneTelNumber == "")
+          FeedbackResult.ReceiverInfos.NoVisitCard.PhoneTelNumber = "";
+        else
+          FeedbackResult.ReceiverInfos.NoVisitCard.PhoneTelNumber = phoneTelNumber;
+
+        if(webPage == null || webPage == undefined || webPage == "")
+          FeedbackResult.ReceiverInfos.NoVisitCard.WebPage = "";
+        else
+          FeedbackResult.ReceiverInfos.NoVisitCard.WebPage = webPage;
+
+        saveDB(FeedbackResult, "Firma Bilgisi kaydedildi!", 7);
+      }
+      else
+        warningShow("Lütfen Firma Sabit Telefon Numarasını boş bırakmayınız!");
+    };
+
+    $scope.oneselfInfos = function (nameSurname, telNumber, tckn, email) {
+      var isValidTckn = true;
+      if(tckn != "" && tckn != null && tckn != undefined)
+        isValidTckn = checkTCKN(tckn);
+      if(!isValidTckn && tckn != "" && tckn != null && tckn != undefined)
+        warningShow("T.C. Kimlik Numarası Doğrulanamadı!");
+      else if(nameSurname != null || nameSurname != undefined || nameSurname != "") {
+        FeedbackResult.ReceiverInfos.Oneself.NameSurname = nameSurname;
+
+        if(email == null || email == undefined || email == "")
+          FeedbackResult.ReceiverInfos.Oneself.Email = "";
+        else
+          FeedbackResult.ReceiverInfos.Oneself.Email = email;
+
+        if(tckn == null || tckn == undefined || tckn == "")
+          FeedbackResult.ReceiverInfos.Oneself.TCKN = "";
+        else
+          FeedbackResult.ReceiverInfos.Oneself.TCKN = tckn;
+
+        if(telNumber == null || telNumber == undefined || telNumber == "")
+          FeedbackResult.ReceiverInfos.Oneself.PhoneNumber = "";
+        else
+          FeedbackResult.ReceiverInfos.Oneself.PhoneNumber = telNumber;
+
+        saveDB(FeedbackResult, "İmza Yetkili kişi bilgileri kaydedildi!", 8);
+      }
+      else
+        warningShow("Lütfen Ad Soyad alanını boş bırakmayınız!");
+    };
+
+    $scope.accountancyInfos = function (nameSurname, phoneTelNumber, tckn, email) {
+      var isValidTckn = true;
+      if(tckn != "" && tckn != null && tckn != undefined)
+        isValidTckn = checkTCKN(tckn);
+      if(!isValidTckn && tckn != "" && tckn != null && tckn != undefined)
+        warningShow("T.C. Kimlik Numarası Doğrulanamadı!");
+      else if(nameSurname != null || nameSurname != undefined || nameSurname != "") {
+        FeedbackResult.ReceiverInfos.Accountancy.NameSurname = nameSurname;
+
+        if(email == null || email == undefined || email == "")
+          FeedbackResult.ReceiverInfos.Accountancy.Email = "";
+        else
+          FeedbackResult.ReceiverInfos.Accountancy.Email = email;
+
+        if(tckn == null || tckn == undefined || tckn == "")
+          FeedbackResult.ReceiverInfos.Accountancy.TCKN = "";
+        else
+          FeedbackResult.ReceiverInfos.Accountancy.TCKN = tckn;
+
+        if(phoneTelNumber == null || phoneTelNumber == undefined || phoneTelNumber == "")
+          FeedbackResult.ReceiverInfos.Accountancy.PhoneTelNumber = "";
+        else
+          FeedbackResult.ReceiverInfos.Accountancy.PhoneTelNumber = phoneTelNumber;
+
+        saveDB(FeedbackResult, "Muhasebe Yetkili kişi bilgileri kaydedildi!", 9);
+      }
+      else
+        warningShow("Lütfen alanları boş bırakmayınız!");
+    };
+
+    $scope.receiverInfos = function (nameSurname, telNumber, jobDescription, email) {
+      if((nameSurname != null || nameSurname != undefined || nameSurname != "") &&
+        (telNumber != null || telNumber != undefined || telNumber != "") &&
+        (jobDescription != null || jobDescription != undefined || jobDescription != "")) {
         FeedbackResult.ReceiverInfos.Interviewed.JobDescription = jobDescription;
         FeedbackResult.ReceiverInfos.Interviewed.NameSurname = nameSurname;
         FeedbackResult.ReceiverInfos.Interviewed.PhoneNumber = telNumber;
 
-        saveDB(FeedbackResult, "Görüşülen kişi bilgileri kaydedildi!", 7);
+        if(email == null || email == undefined || email == "")
+          FeedbackResult.ReceiverInfos.Interviewed.Email = "";
+        else
+          FeedbackResult.ReceiverInfos.Interviewed.Email = email;
+
+        saveDB(FeedbackResult, "Görüşülen kişi bilgileri kaydedildi!", 10);
       }
       else
         warningShow("Lütfen alanları boş bırakmayınız!");
@@ -717,64 +927,30 @@ angular.module('starter.controllers', [])
       $scope.isReceiverEqualOneself = isReceiverEqualOneself;
       if(isReceiverEqualOneself)
       {
-        $scope.oneselfNameSurname = FeedbackResult.ReceiverInfos.Interviewed.NameSurname;
-        $scope.oneselfTelNumber = FeedbackResult.ReceiverInfos.Interviewed.PhoneNumber;
+        $scope.receiverNameSurname = FeedbackResult.ReceiverInfos.Oneself.NameSurname;
+        $scope.receiverTelNumber = FeedbackResult.ReceiverInfos.Oneself.PhoneNumber;
       }
       else
       {
-        $scope.oneselfNameSurname = "";
-        $scope.oneselfTelNumber = "";
+        $scope.receiverNameSurname = "";
+        $scope.receiverTelNumber = "";
       }
-    };
-
-    $scope.oneselfInfos = function (nameSurname, telNumber, tckn, email) {
-      var isValidTckn = checkTCKN(tckn);
-      if(!isValidTckn)
-        warningShow("T.C. Kimlik Numarası Doğrulanamadı!");
-      else if(nameSurname.length && telNumber.length && tckn.length && email.length) {
-        FeedbackResult.ReceiverInfos.Oneself.Email = email;
-        FeedbackResult.ReceiverInfos.Oneself.NameSurname = nameSurname;
-        FeedbackResult.ReceiverInfos.Oneself.TCKN = tckn;
-        FeedbackResult.ReceiverInfos.Oneself.PhoneNumber = telNumber;
-
-        var nextVal = 0;
-        if($scope.visitChoice == 'visitCardOk')
-          nextVal = 9;
-        else
-          nextVal = 8;
-
-        saveDB(FeedbackResult, "Yetkili kişi bilgileri kaydedildi!", nextVal);
-      }
-      else
-        warningShow("Lütfen alanları boş bırakmayınız!");
-    };
-
-    $scope.noVisitCardInfos = function (staticTelNumber, faxNumber, noVisitCardEmail) {
-      if(staticTelNumber.length && faxNumber.length && noVisitCardEmail.length) {
-        FeedbackResult.ReceiverInfos.NoVisitCard.Email = noVisitCardEmail;
-        FeedbackResult.ReceiverInfos.NoVisitCard.FaxNumber = faxNumber;
-        FeedbackResult.ReceiverInfos.NoVisitCard.StaticTelNumber = staticTelNumber;
-
-        saveDB(FeedbackResult, "Görüşülen kişi (Kartvizit Olmayan) bilgileri kaydedildi!", 9);
-      }
-      else
-        warningShow("Lütfen alanları boş bırakmayınız!");
     };
 
     $scope.sendSms = function () {
       $scope.smsPassword = Math.floor(1000 + Math.random() * 9000);
       $scope.gsmNumber = FeedbackResult.ReceiverInfos.Interviewed.PhoneNumber;
       $scope.smsNameSurname = FeedbackResult.ReceiverInfos.Interviewed.NameSurname;
-      $scope.message = 'Sn.' + $scope.smsNameSurname + ', Ankara Ticaret Odası ' +
-                       'Üye Bilgi Güncelleme Formu şifresi ' + $scope.smsPassword + ' dir. ' +
+      $scope.message = 'Sn.' + $scope.smsNameSurname + ', ATO Üye firma bilgileriniz, ' +
+                       $scope.smsPassword + ' onay kodu ile güncellenmiştir. ' +
                        '' + $scope.dist.WorkOrderDataInfo[0].Label + ' : ' +
                        '' + $scope.dist.WorkOrderDataInfo[0].Description + ' ' +
-                       'Firma Yetkilisi : ' + FeedbackResult.ReceiverInfos.Oneself.NameSurname + '';
+                       'İmza Yetkilisi : ' + FeedbackResult.ReceiverInfos.Oneself.NameSurname + '';
       $scope.isSend = false;
 
       $http({
         method: 'POST',
-        url: Server.Development + 'Message/Create', // 'http://rlservice.telekurye.com.tr:9810/Message/Create',
+        url: 'http://rlservice.telekurye.com.tr:9810/Message/Create', // 'http://rlservice.telekurye.com.tr:9810/Message/Create',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded',
           'Access-Control-Allow-Origin': '*',
           'Authorization': $localStorage.Token},
@@ -782,6 +958,7 @@ angular.module('starter.controllers', [])
       })
         .success(function (data, status, headers, config) {
           $scope.isSend = true;
+          //ToastService.setToastInit("Sms " + $scope.gsmNumber + " numarasına gönderildi.", "short", "center");
           warningShow("Sms " + $scope.gsmNumber + " numarasına gönderildi.");
         })
         .error(function (data, status) {
@@ -799,7 +976,7 @@ angular.module('starter.controllers', [])
       {
         FeedbackResult.SmsConfirmInfos.IsSent = true;
         FeedbackResult.SmsConfirmInfos.Description = $scope.message;
-        saveDB(FeedbackResult, "Sms bilgisi doğrulandı!", 10);
+        saveDB(FeedbackResult, "Sms bilgisi doğrulandı!", 12);
         $scope.pauseTimer();
         $scope.done = true;
       }
@@ -907,6 +1084,8 @@ angular.module('starter.controllers', [])
        $pouchDB.save(jsonDocument).then(function(response) {
          if(response.ok == true)
          {
+           ToastService.setToastInit("Görev tamamlandı. Diğer göreve geçebilirsiniz.", "short", "center");
+
            //confirmShow("Görev tamamlandı. Diğer göreve geçebilirsiniz.");
            $rootScope.workingOnMission = null;
            $localStorage.previousObjectId = $stateParams.distId;
@@ -949,12 +1128,65 @@ angular.module('starter.controllers', [])
 
   })
 
-  .controller('LoginCtrl', function($scope, LoginService, $state, $cordovaDialogs,
-                                    $localStorage, $ionicLoading) {
+  .controller('LoginCtrl', function($scope, LoginService, $state, $cordovaDialogs, AlertDialog,
+                                    $localStorage, $ionicLoading, $cordovaFileTransfer,
+                                    $timeout, $cordovaFileOpener2, $cordovaToast, ProgressDialog) {
     $localStorage.Token = null;
     $scope.form = {};
     $scope.username = "";
     $scope.password = "";
+
+    $scope.showbar = function () {
+      ProgressDialog.setProgressIndicator("Lütfen Bekleyiniz!", "Güncelleme indiriliyor...", false);
+    };
+
+    $scope.dwnload = function() {
+      document.addEventListener('deviceready', function () {
+        var url = "http://rl.telekurye.com.tr/download/apk/tkato.apk";// "http://192.168.1.27/download/apk/tkato.apk";
+        var targetPath = cordova.file.externalRootDirectory + "/Download/tkato.apk";
+        var trustHosts = true;
+        var options = {};
+
+        $scope.showbar();
+
+        $cordovaFileTransfer.download(url, targetPath, options, trustHosts)
+          .then(function(result) {
+            updateApp(result);
+          }, function(err) {
+            AlertDialog.setDialogInit(err, 'İndirme başarısız!', 'Tamam');
+          }, function (progress) {
+            $timeout(function () {
+              $scope.downloadProgress = parseInt((progress.loaded / progress.total) * 100);
+              ProgressDialog.setProgressPercent($scope.downloadProgress);
+            });
+          });
+
+      }, false);
+
+      var updateApp = function(entry) {
+        $cordovaFileOpener2.open(
+          entry.nativeURL,
+          'application/vnd.android.package-archive'
+        ).then(function() {
+          isInstalled();
+        }, function(err) {
+          AlertDialog.setDialogInit(err, 'İndirme başarısız!!', 'Tamam');
+        });
+      };
+
+      var isInstalled = function () {
+        $cordovaFileOpener2.appIsInstalled('io.telekurye.tkato').then(function(res) {
+          if (res.status === 0) {
+            ProgressDialog.setProgressDismiss();
+            AlertDialog.setDialogInit('TKATO yüklenemedi!', 'Yükleme başarısız!', 'Tamam');
+
+          } else {
+            ProgressDialog.setProgressDismiss();
+            ionic.Platform.exitApp();
+          }
+        });
+      };
+    };
 
     $scope.login = function(username, password) {
       $ionicLoading.show();
@@ -968,11 +1200,11 @@ angular.module('starter.controllers', [])
         }
         else {
           $ionicLoading.hide();
-          $cordovaDialogs.alert('Lütfen kullanıcı bilgilerinizi kontrol ediniz.', 'Giriş başarısız!', 'Tamam');
+          AlertDialog.setDialogInit('Lütfen kullanıcı bilgilerinizi kontrol ediniz.', 'Giriş başarısız!', 'Tamam');
         }
       }, function(err) {
         $ionicLoading.hide();
-        $cordovaDialogs.alert('Lütfen kullanıcı bilgilerinizi kontrol ediniz.', 'Giriş başarısız!', 'Tamam');
+        AlertDialog.setDialogInit('Lütfen kullanıcı bilgilerinizi kontrol ediniz.', 'Giriş başarısız!', 'Tamam');
       });
     };
 

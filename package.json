@@ -56,6 +56,10 @@
     "cordova-plugin-whitelist@1",
     "cordova-plugin-whitelist",
     "cordova-plugin-device",
-    "cordova-plugin-sqlite"
+    "cordova-plugin-sqlite",
+    "https://github.com/pwlin/cordova-plugin-file-opener2.git",
+    "https://github.com/pbernasconi/cordova-progressIndicator.git",
+    "https://github.com/EddyVerbruggen/Toast-PhoneGap-Plugin.git",
+    "cordova-plugin-pdialog"
   ]
 }

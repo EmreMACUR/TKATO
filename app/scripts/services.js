@@ -4,21 +4,22 @@ angular.module('starter.services', [])
     template: '<ion-spinner></ion-spinner><br/>Lütfen Bekleyiniz...',
     number: 2000
   })
-  .constant('Server', {
-    Development : 'XXX',
-    Product: 'XXX',
-    CouchDevelopment: 'XXX',
-    CouchProduct: 'XXX'
-  })
+  /*.constant('Server', {
+   Development : 'XXX',
+   Product: 'XXX',
+   CouchDevelopment: 'XXX',
+   CouchProduct: 'XXX'
+   })*/
 
   .service("$pouchDB", ["$rootScope", "$q", "$localStorage", "$cordovaDialogs",
     function($rootScope, $q, $localStorage, $cordovaDialogs) {
 
     var database;
     var changeListener;
+    var isMissionContinious = false;
 
     this.setDatabase = function(databaseName) {
-      database = new PouchDB(databaseName);
+      database = new PouchDB(databaseName, {adapter: 'websql'});
     };
 
     this.startListening = function() {
@@ -45,8 +46,9 @@ angular.module('starter.services', [])
     };
 
     var missionContinious = function (docCount) {
-      if(docCount == 0)
+      if(docCount == 0 && !isMissionContinious)
       {
+        isMissionContinious = true;
         $cordovaDialogs.alert('Dağıtım göreviniz bulunmamaktadır.', 'Bilgilendirme', 'Çıkış Yap')
         .then(function() {
           database.destroy().then(function (response) {
@@ -245,6 +247,49 @@ angular.module('starter.services', [])
         });
       }
     };
+  }])
+
+  .service('ProgressDialog', function () {
+
+    this.setProgressIndicator = function(title, message, cancelable) {
+      cordova.plugin.pDialog.init({
+          theme: 'HOLO_DARK',
+          title: title,
+          message : message,
+          progressStyle: 'HORIZONTAL'
+        })
+        .setProgress(0)
+        .setCancelable(cancelable);
+    };
+
+    this.setProgressPercent = function (per) {
+      cordova.plugin.pDialog.setProgress(per);
+    };
+
+    this.setProgressDismiss = function () {
+      cordova.plugin.pDialog.dismiss();
+    }
+  })
+
+  .service('AlertDialog', ['$cordovaDialogs', function($cordovaDialogs) {
+
+    this.setDialogInit = function(message, title, buttonName) {
+      $cordovaDialogs.alert(message, title, buttonName);
+    };
+  }])
+
+  .service('ToastService', ['$cordovaToast', function($cordovaToast) {
+
+    this.setToastInit = function(message, duration, position) {
+      $cordovaToast.show(message, duration, position);
+      // duration: 'short', 'long', '3000', 900
+      // position: 'top', 'center', 'bottom'
+    };
+
+    this.setToastClose = function() {
+      $cordovaToast.hide();
+    };
+
   }])
 
   .service('LoginService', function($q, $http, $localStorage, UserService, Server) {

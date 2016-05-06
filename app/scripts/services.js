@@ -4,6 +4,7 @@ angular.module('starter.services', [])
     template: '<ion-spinner></ion-spinner><br/>Lütfen Bekleyiniz...',
     number: 2000
   })
+
   /*.constant('Server', {
    Development : 'XXX',
    Product: 'XXX',
@@ -13,13 +14,23 @@ angular.module('starter.services', [])
 
   .service("$pouchDB", ["$rootScope", "$q", "$localStorage", "$cordovaDialogs",
     function($rootScope, $q, $localStorage, $cordovaDialogs) {
+      Date.prototype.addHours= function(h){
+        this.setHours(this.getHours()+h);
+        return this;
+      };
 
+      Date.prototype.addDays = function(days)
+      {
+        var dat = new Date(this.valueOf());
+        dat.setDate(dat.getDate() + days);
+        return dat;
+      };
     var database;
     var changeListener;
     var isMissionContinious = false;
 
     this.setDatabase = function(databaseName) {
-      database = new PouchDB(databaseName, {adapter: 'websql'});
+      database = new PouchDB(databaseName, {adapter: 'websql', auto_compaction: true});
     };
 
     this.startListening = function() {
@@ -27,18 +38,30 @@ angular.module('starter.services', [])
         live: true,
         include_docs: true
       }).on("change", function(change) {
+        var minDate, maxDate, nowDate =  new Date().addDays(1).addHours(-21).toISOString().slice(0, 19), courierId;
         if(!change.deleted) {
           $rootScope.$broadcast("$pouchDB:change", change);
+          courierId = "" + change.doc.CourierId;
 
-          if(change.doc.CourierId != $localStorage.UserId)
+          if(courierId != $localStorage.UserId)
             deleteNonDb(change.doc._id);
+          else {
+            minDate = Date.parse(change.doc.OperationDate.MinDate);
+            maxDate = Date.parse(change.doc.OperationDate.MaxDate);
+            nowDate = Date.parse(nowDate);
+            if(minDate <= nowDate && nowDate <= maxDate)
+              console.log();
+            else
+              deleteNonDb(change.doc._id);
+          }
+
         } else {
           $rootScope.$broadcast("$pouchDB:delete", change);
         }
         getDbInfo().then(function(response) {
           $rootScope.dbInfo = response;
           $rootScope.distCount = response.doc_count;
-          missionContinious(response.doc_count);
+          //missionContinious(response.doc_count);
         });
         cleanup();
         compact();
@@ -130,12 +153,23 @@ angular.module('starter.services', [])
       return deferred.promise;
     };
 
+    this.saveAttachment = function(_id, name, data, content_type) {
+      var deferred = $q.defer();
+        database.putAttachment(_id, name, data, content_type)
+        .then(function(response) {
+          deferred.resolve(response);
+        }).catch(function(error) {
+          deferred.reject(error);
+        });
+      return deferred.promise;
+    };
+
     this.delete = function(documentId, documentRevision) {
       return database.remove(documentId, documentRevision);
     };
 
     this.get = function(documentId) {
-      return database.get(documentId);
+      return database.get(documentId, {attachments: true});
     };
 
     this.destroy = function() {
@@ -303,7 +337,7 @@ angular.module('starter.services', [])
 
         $http({
           method: 'POST',
-          url: Server.Development + 'token', // 'http://rlservice.telekurye.com.tr:9810/token',
+          url: Server.Development + 'ATO/token', // 'http://rlservice.telekurye.com.tr/token',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded'},
           data: 'grant_type=password&username=' + name + '&password=' + pw
         })
@@ -353,9 +387,9 @@ angular.module('starter.services', [])
 
         $localStorage.UserId = 0;
 
-        $http.get(Server.Development + 'UserInfo/Details/?username=' + name + '&password=' + pw).
+        $http.get(Server.Development + 'ATO/UserInfo/Details/?username=' + name + '&password=' + pw).
         success(function(data, status, headers, config) {
-            $localStorage.UserId = data;
+            $localStorage.UserId = "" + data;
 
             if ($localStorage.UserId) {
               deferred.resolve($localStorage.UserId);
@@ -366,6 +400,46 @@ angular.module('starter.services', [])
         error(function (data, status) {
             $localStorage.UserId = 0;
             deferred.reject($localStorage.UserId);
+        });
+
+        promise.success = function(fn) {
+          promise.then(fn);
+          return promise;
+        };
+        promise.error = function(fn) {
+          promise.then(null, fn);
+          return promise;
+        };
+        return promise;
+      }
+    }
+  })
+
+  .service('VersionService', function($q, $http, $localStorage, Server) {
+    return {
+      check: function() {
+        var deferred = $q.defer();
+        var promise = deferred.promise;
+
+        var version = null;
+
+        $http.get(Server.Development + 'ATOVersionCheck/Api/Check').
+        success(function(data, status, headers, config) {
+          if(status != 200)
+            deferred.reject(null);
+          else {
+            version = data;
+
+            if (version) {
+              deferred.resolve(version);
+            } else {
+              deferred.reject(null);
+            }
+          }
+        }).
+        error(function (data, status) {
+          version = null;
+          deferred.reject(version);
         });
 
         promise.success = function(fn) {

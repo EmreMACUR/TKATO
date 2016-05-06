@@ -1,7 +1,7 @@
 angular.module('starter.controllers', [])
 
   .controller('DistsCtrl', function($scope, $ionicLoading, $pouchDB, $localStorage,
-                                    $rootScope, $filter, Server) {
+                                    $rootScope, $filter, Server, $cordovaDialogs) {
     $pouchDB.setDatabase("syncDatabase");
     $pouchDB.sync(Server.CouchDevelopment + $localStorage.UserId);
     //$pouchDB.sync(Server.CouchProduct + $localStorage.UserId);
@@ -27,7 +27,7 @@ angular.module('starter.controllers', [])
     });
   })
 
-  .controller('DistDetailCtrl', function($scope, $stateParams, $pouchDB, $rootScope,
+  .controller('DistDetailCtrl', function($scope, $stateParams, $pouchDB, $rootScope, $q,
                                          $ionicLoading, $http, $timeout, $ionicModal,
                                          $cordovaCamera, $cordovaDialogs, $localStorage,
                                          $cordovaGeolocation, $state, Server, ToastService) {
@@ -54,6 +54,18 @@ angular.module('starter.controllers', [])
           $state.go('tab.dists');
         });
     }
+
+    Date.prototype.addHours= function(h){
+      this.setHours(this.getHours()+h);
+      return this;
+    };
+
+    Date.prototype.addDays = function(days)
+    {
+      var dat = new Date(this.valueOf());
+      dat.setDate(dat.getDate() + days);
+      return dat;
+    };
 
     $scope.previousObjectId = null;
     $ionicLoading.show();
@@ -86,6 +98,8 @@ angular.module('starter.controllers', [])
     $scope.visitChoice = $scope.visitCardChoice;
     $scope.OutsidePhotoCount = 0;
     $scope.InsidePhotoCount = 0;
+    $scope.outsideCount = 0;
+    $scope.insideCount = 0;
     $scope.isReceiverEqualOneself = false;
     $scope.receiverNameSurname = "";
     $scope.receiverTelNumber = "";
@@ -143,8 +157,16 @@ angular.module('starter.controllers', [])
         "Platform": null,
         "Model": null,
         "Version": null,
-        "AppVersion": null
+        "AppVersion": null,
+        "TKATOVersion": null
       }
+    };
+    var attachments = {
+      Out_BuildingImage: { content_type: 'text/plain', data: ''},
+      Out_TaxCertificateImage: { content_type: 'text/plain', data: ''},
+      Out_CompanySignBoardImage: { content_type: 'text/plain', data: ''},
+      In_BusinessCardImage: { content_type: 'text/plain', data: ''},
+      In_SignatureImage: { content_type: 'text/plain', data: ''}
     };
 
     if($localStorage.previousObjectId != null)
@@ -176,6 +198,8 @@ angular.module('starter.controllers', [])
     var warningShow = function (txt) {
       $cordovaDialogs.alert(txt, 'Uyarı', 'Tamam')
     };
+
+    var phaseList = ['phase1', 'phase2', 'phase3', 'phase4', 'phase5', 'phase6', 'phase7', 'phase8', 'phase9', 'phase10', 'phase11', 'phase12'];
 
     var phase0 = function() {
       $scope.isLoading = true;
@@ -401,6 +425,8 @@ angular.module('starter.controllers', [])
     var loadData = function(document) {
       $ionicLoading.show();
       phase0();
+      var outsidePhotoCount = 0;
+      var insidePhotoCount = 0;
 
       jsonDocument = document;
 
@@ -408,6 +434,61 @@ angular.module('starter.controllers', [])
       {
         FeedbackResult = jsonDocument.FeedbackResult;
 
+        if(jsonDocument._attachments.Out_BuildingImage.data != "" &&
+           jsonDocument._attachments.Out_BuildingImage.length != 0) {
+          $scope.isNotPhotoBuildingButton = true;
+          outsidePhotoCount = outsidePhotoCount + 1;
+          base64ToBlob(jsonDocument._attachments.Out_BuildingImage.data).then(function (response) {
+            attachments.Out_BuildingImage.data = response;
+          }, function (error) {
+            //attachments.Out_BuildingImage.data = "";
+          });
+        }
+        if(jsonDocument._attachments.Out_CompanySignBoardImage.data != "" &&
+           jsonDocument._attachments.Out_CompanySignBoardImage.length != 0) {
+          $scope.isNotPhotoCompanyButton = true;
+          outsidePhotoCount = outsidePhotoCount + 1;
+          base64ToBlob(jsonDocument._attachments.Out_CompanySignBoardImage.data).then(function (response) {
+            attachments.Out_CompanySignBoardImage.data = response;
+          }, function (error) {
+            //attachments.Out_CompanySignBoardImage.data = "";
+          });
+        }
+        if(jsonDocument._attachments.Out_TaxCertificateImage.data != "" &&
+           jsonDocument._attachments.Out_TaxCertificateImage.length != 0) {
+          $scope.isNotPhotoTaxButton = true;
+          outsidePhotoCount = outsidePhotoCount + 1;
+          base64ToBlob(jsonDocument._attachments.Out_TaxCertificateImage.data).then(function (response) {
+            attachments.Out_TaxCertificateImage.data = response;
+          }, function (error) {
+            //attachments.Out_TaxCertificateImage.data = "";
+          });
+        }
+        if(jsonDocument._attachments.In_BusinessCardImage.data != "" &&
+           jsonDocument._attachments.In_BusinessCardImage.length != 0) {
+          $scope.isNotPhotoBusinessCardButton = true;
+          insidePhotoCount = insidePhotoCount + 1;
+          base64ToBlob(jsonDocument._attachments.In_BusinessCardImage.data).then(function (response) {
+            attachments.In_BusinessCardImage.data = response;
+          }, function (error) {
+            //attachments.In_BusinessCardImage.data = "";
+          });
+        }
+        if(jsonDocument._attachments.In_SignatureImage.data != "" &&
+           jsonDocument._attachments.In_SignatureImage.length != 0) {
+          $scope.isNotPhotoSignatureButton = true;
+          insidePhotoCount = insidePhotoCount + 1;
+          base64ToBlob(jsonDocument._attachments.In_SignatureImage.data).then(function (response) {
+            attachments.In_SignatureImage.data = response;
+          }, function (error) {
+            //attachments.In_SignatureImage.data = "";
+          });
+        }
+
+        $scope.outsideCount = outsidePhotoCount;
+        $scope.insideCount = insidePhotoCount;
+        $scope.OutsidePhotoCount = $scope.outsideCount;
+        $scope.InsidePhotoCount = $scope.insideCount;
         $scope.WorkOrderDataStatus = jsonDocument.WorkOrderDataStatus;
 
         $scope.OutsideMin = jsonDocument.PhotoRequirements.Outside.Min;
@@ -415,13 +496,12 @@ angular.module('starter.controllers', [])
         $scope.InsideMin = jsonDocument.PhotoRequirements.Inside.Min;
         $scope.InsideMax = jsonDocument.PhotoRequirements.Inside.Max;
 
-        $scope.outsideCount = FeedbackResult.ImageInfos.OutsideImages.BuildingImages.length +
+        /*$scope.outsideCount = FeedbackResult.ImageInfos.OutsideImages.BuildingImages.length +
                            FeedbackResult.ImageInfos.OutsideImages.CompanySignboards.length +
                            FeedbackResult.ImageInfos.OutsideImages.TaxCertificateImages.length;
         $scope.insideCount = FeedbackResult.ImageInfos.InsideImages.BusinessCardImages.length +
                           FeedbackResult.ImageInfos.InsideImages.SignatureImages.length;
-        $scope.OutsidePhotoCount = $scope.outsideCount;
-        $scope.InsidePhotoCount = $scope.insideCount;
+
 
         if(FeedbackResult.ImageInfos.OutsideImages.BuildingImages.length != 0)
           $scope.isNotPhotoBuildingButton = true;
@@ -432,7 +512,7 @@ angular.module('starter.controllers', [])
         if(FeedbackResult.ImageInfos.InsideImages.BusinessCardImages.length != 0)
           $scope.isNotPhotoBusinessCardButton = true;
         if(FeedbackResult.ImageInfos.InsideImages.SignatureImages.length != 0)
-          $scope.isNotPhotoSignatureButton = true;
+          $scope.isNotPhotoSignatureButton = true;*/
 
         if(!FeedbackResult.SmsConfirmInfos.Description &&
           $scope.InsideMax != $scope.InsidePhotoCount &&
@@ -501,6 +581,11 @@ angular.module('starter.controllers', [])
         FeedbackResult.ImageInfos.OutsideImages.BuildingImages = [];
         FeedbackResult.ImageInfos.OutsideImages.CompanySignboards = [];
         FeedbackResult.ImageInfos.OutsideImages.TaxCertificateImages = [];
+        attachments.Out_BuildingImage.data = "";
+        attachments.Out_CompanySignBoardImage.data = "";
+        attachments.Out_TaxCertificateImage.data = "";
+        attachments.In_BusinessCardImage.data = "";
+        attachments.In_SignatureImage.data = "";
         $scope.OutsidePhotoCount = 0;
         $scope.InsidePhotoCount = 0;
         $scope.isNotPhotoBuildingButton = false;
@@ -513,6 +598,17 @@ angular.module('starter.controllers', [])
 
       $scope.isLoading = false;
       $ionicLoading.hide();
+    };
+
+    var base64ToBlob = function (base64Data) {
+      var deferred = $q.defer();
+      blobUtil.base64StringToBlob(base64Data).then(function (blob) {
+        deferred.resolve(blob);
+      }).catch(function (error) {
+        //error
+        deferred.reject(null);
+      });
+      return deferred.promise;
     };
 
     $pouchDB.get($stateParams.distId).then(function(response) {
@@ -544,6 +640,9 @@ angular.module('starter.controllers', [])
       if($stateParams.distId) {
         jsonDocument["_id"] = $stateParams.distId;
         jsonDocument["FeedbackResult"] = feedback;
+        if(confirmText == "Properties Save DB" ||
+           confirmText == "Process return")
+          jsonDocument["_attachments"] = attachments;
       }
       $pouchDB.save(jsonDocument).then(function(response) {
         if(response.ok == true)
@@ -569,7 +668,7 @@ angular.module('starter.controllers', [])
       $ionicLoading.show();
       $pouchDB.get($localStorage.previousObjectId).then(function(response) {
         $ionicLoading.hide();
-        $scope.previousMissionPhoto = response.FeedbackResult.ImageInfos.OutsideImages.BuildingImages[0].Image;
+        $scope.previousMissionPhoto = response._attachments.Out_BuildingImage.data;
 
       }, function(error) {
         $ionicLoading.hide();
@@ -591,7 +690,7 @@ angular.module('starter.controllers', [])
     };
     $scope.closeModal = function(buttonIndex) {
       if(buttonIndex == 1)
-        saveOutsideImage($scope.previousMissionPhoto);
+        base64toBlobData($scope.previousMissionPhoto, 1);
       else
         $scope.previousMissionPhoto = null;
       $ionicLoading.hide();
@@ -615,6 +714,8 @@ angular.module('starter.controllers', [])
       $scope.receiverNameSurname = "";
       $scope.receiverTelNumber = "";
       $scope.InsidePhotoCount = 0;
+      attachments.In_BusinessCardImage.data = "";
+      attachments.In_SignatureImage.data = "";
       FeedbackResult.ImageInfos.InsideImages.BusinessCardImages = [];
       FeedbackResult.ImageInfos.InsideImages.SignatureImages = [];
       FeedbackResult.DeliveryStatusInfos = {"IsDelivery": null, "Id": null, "Description": null};
@@ -646,7 +747,7 @@ angular.module('starter.controllers', [])
         }
       };
       FeedbackResult.SmsConfirmInfos = { "IsSent": null, "Description": null };
-      saveDB(FeedbackResult, "", 2);
+      saveDB(FeedbackResult, "Process return", 2);
     };
 
     $scope.isProcessReturn = function () {
@@ -670,21 +771,74 @@ angular.module('starter.controllers', [])
       };
 
       if(clickStatus == 1 || clickStatus == 2 || clickStatus == 3)
-      {
-        $cordovaCamera.getPicture(options).then(function (imageData) {
-          saveOutsideImage(imageData, clickStatus);
-        }, function (err) {
+        options = {
+          destinationType: Camera.DestinationType.DATA_URL,
+          sourceType: Camera.PictureSourceType.CAMERA,
+          allowEdit: true,
+          targetWidth: 1000,
+          targetHeight: 1000,
+          encodingType: Camera.EncodingType.JPEG,
+          popoverOptions: CameraPopoverOptions,
+          saveToPhotoAlbum: false
+        };
 
-        });
-      }
-      else if(clickStatus == 4 || clickStatus == 5)
-      {
-        $cordovaCamera.getPicture(options).then(function (imageData) {
-          saveInsideImage(imageData, clickStatus);
-        }, function (err) {
+      $cordovaCamera.getPicture(options).then(function (imageData) {
+        base64toBlobData(imageData, clickStatus);
+        //saveOutsideImage(imageData, clickStatus);
+      }, function (error) {
+        warningShow("Cihazdaki kamera bilgisi hata verdi. Lütfen Tekrar fotoğraf çekiniz.");
+      });
+    };
 
-        });
-      }
+    var base64toBlobData = function (imgdata, status) {
+      blobUtil.base64StringToBlob(imgdata).then(function (blob) {
+        if($stateParams.distId) {
+          jsonDocument["_id"] = $stateParams.distId;
+          if(status == 1)
+            attachments.Out_BuildingImage.data = blob;
+          else if(status == 2)
+            attachments.Out_CompanySignBoardImage.data = blob;
+          else if(status == 3)
+            attachments.Out_TaxCertificateImage.data = blob;
+          else if(status == 4)
+            attachments.In_BusinessCardImage.data = blob;
+          else if(status == 5)
+            attachments.In_SignatureImage.data = blob;
+
+          jsonDocument["_attachments"] = attachments;
+          //jsonDocument["FeedbackResult"] = FeedbackResult;
+        }
+        saveAttachment(jsonDocument, status);
+      }).catch(function (error) {
+        warningShow("Resim, geçerli formata dönüştürülemedi. Hata : " + error);
+      });
+    };
+
+    var saveAttachment = function (data, clickStatus) {
+      $pouchDB.save(data).then(function(response) {
+        if(response.ok == true) {
+          $ionicLoading.hide();
+          if(clickStatus == 1)
+            ToastService.setToastInit("Bina Fotoğrafı Kaydedildi", "short", "top");
+          else if(clickStatus == 2)
+            ToastService.setToastInit("Firma Tabela Fotoğrafı Kaydedildi", "short", "top");
+          else if(clickStatus == 3)
+            ToastService.setToastInit("Vergi Levhası Fotoğrafı Kaydedildi", "short", "top");
+          else if(clickStatus == 4)
+            ToastService.setToastInit("Kartvizit Fotoğrafı Kaydedildi", "short", "top");
+          else if(clickStatus == 5)
+            ToastService.setToastInit("Kaşe Fotoğrafı Kaydedildi", "short", "top");
+
+          if(clickStatus == 1 || clickStatus == 2 || clickStatus == 3) {
+
+
+            if($scope.previousMissionPhoto != null)
+              $scope.previousMissionPhoto = null;
+          }
+        }
+      }, function(error) {
+        warningShow("Kayıt esnasında hata oluştu. Hata : " + error);
+      });
     };
 
     var saveDeviceProperties = function() {
@@ -693,14 +847,15 @@ angular.module('starter.controllers', [])
       FeedbackResult.DeviceProperties.Platform = $localStorage.platform;
       FeedbackResult.DeviceProperties.UUID = $localStorage.uuid;
       FeedbackResult.DeviceProperties.Version = $localStorage.version;
-      saveDB(FeedbackResult, "", 1);
+      FeedbackResult.DeviceProperties.TKATOVersion = $localStorage.TKATOVersion;
+      saveDB(FeedbackResult, "Properties Save DB", 1);
     };
 
     var saveOutsideImage = function(imageData, photoStatus) {
       var now = new Date();
       imageJsonDocument = {};
       imageJsonDocument.Image = imageData;
-      imageJsonDocument.CreateDate = now.toISOString();
+      imageJsonDocument.CreateDate = now.addDays(1).addHours(-21).toISOString().slice(0, 19);
       imageJsonDocument.Lat = $scope.lat;
       imageJsonDocument.Long = $scope.long;
       imageJsonDocument.Accuracy = 0;
@@ -724,7 +879,7 @@ angular.module('starter.controllers', [])
       var now = new Date();
       imageJsonDocument = {};
       imageJsonDocument.Image = imageData;
-      imageJsonDocument.CreateDate = now.toISOString();
+      imageJsonDocument.CreateDate = now.addDays(1).addHours(-21).toISOString().slice(0, 19);
       imageJsonDocument.Lat = $scope.lat;
       imageJsonDocument.Long = $scope.long;
       imageJsonDocument.Accuracy = 0;
@@ -734,9 +889,9 @@ angular.module('starter.controllers', [])
         FeedbackResult.ImageInfos.InsideImages.SignatureImages.push(imageJsonDocument);
 
       if($scope.InsideMax == $scope.InsidePhotoCount+1)
-        saveDB(FeedbackResult, "İç Fotoğraf Kaydedildi!", 12);
-      else
         saveDB(FeedbackResult, "İç Fotoğraf Kaydedildi!", 11);
+      else
+        saveDB(FeedbackResult, "İç Fotoğraf Kaydedildi!", 10);
     };
 
     var checkTCKN = function(value) {
@@ -880,8 +1035,11 @@ angular.module('starter.controllers', [])
         isValidTckn = checkTCKN(tckn);
       if(!isValidTckn && tckn != "" && tckn != null && tckn != undefined)
         warningShow("T.C. Kimlik Numarası Doğrulanamadı!");
-      else if(nameSurname != null || nameSurname != undefined || nameSurname != "") {
-        FeedbackResult.ReceiverInfos.Accountancy.NameSurname = nameSurname;
+      else {
+        if(nameSurname == null || nameSurname == undefined || nameSurname == "")
+          FeedbackResult.ReceiverInfos.Accountancy.NameSurname = " ";
+        else
+          FeedbackResult.ReceiverInfos.Accountancy.NameSurname = nameSurname;
 
         if(email == null || email == undefined || email == "")
           FeedbackResult.ReceiverInfos.Accountancy.Email = "";
@@ -900,8 +1058,6 @@ angular.module('starter.controllers', [])
 
         saveDB(FeedbackResult, "Muhasebe Yetkili kişi bilgileri kaydedildi!", 9);
       }
-      else
-        warningShow("Lütfen alanları boş bırakmayınız!");
     };
 
     $scope.receiverInfos = function (nameSurname, telNumber, jobDescription, email) {
@@ -948,9 +1104,10 @@ angular.module('starter.controllers', [])
                        'İmza Yetkilisi : ' + FeedbackResult.ReceiverInfos.Oneself.NameSurname + '';
       $scope.isSend = false;
 
+      //Server.Development + 'Message/Create
       $http({
         method: 'POST',
-        url: 'http://rlservice.telekurye.com.tr:9810/Message/Create', // 'http://rlservice.telekurye.com.tr:9810/Message/Create',
+        url: Server.Development + 'ATO/Message/Create', // 'http://rlservice.telekurye.com.tr:9810/Message/Create',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded',
           'Access-Control-Allow-Origin': '*',
           'Authorization': $localStorage.Token},
@@ -1071,7 +1228,7 @@ angular.module('starter.controllers', [])
 
     $scope.confirmMission = function () {
       var now = new Date();
-      var CreateDate = now.toISOString();
+      var CreateDate = now.addDays(1).addHours(-21).toISOString().slice(0, 19);
       if($stateParams.distId) {
          jsonDocument["_id"] = $stateParams.distId;
          jsonDocument["Lat"] = $scope.lat;
@@ -1081,33 +1238,33 @@ angular.module('starter.controllers', [])
          jsonDocument["IsVisible"] = false;
          jsonDocument["CreateDate"] = CreateDate;
       }
-       $pouchDB.save(jsonDocument).then(function(response) {
-         if(response.ok == true)
-         {
-           ToastService.setToastInit("Görev tamamlandı. Diğer göreve geçebilirsiniz.", "short", "center");
+     $pouchDB.save(jsonDocument).then(function(response) {
+       if(response.ok == true)
+       {
+         ToastService.setToastInit("Görev tamamlandı. Diğer göreve geçebilirsiniz.", "short", "center");
 
-           //confirmShow("Görev tamamlandı. Diğer göreve geçebilirsiniz.");
-           $rootScope.workingOnMission = null;
-           $localStorage.previousObjectId = $stateParams.distId;
-           $state.go('tab.dists');
-         }
+         //confirmShow("Görev tamamlandı. Diğer göreve geçebilirsiniz.");
+         $rootScope.workingOnMission = null;
+         $localStorage.previousObjectId = $stateParams.distId;
+         $state.go('tab.dists');
+       }
 
-         }, function(error) {
-            warningShow("Teknik bir hata oluştu. Tekrar deneyiniz.");
-       });
+       }, function(error) {
+          warningShow("Teknik bir hata oluştu. Tekrar deneyiniz.");
+     });
     }
   })
 
-  .controller('InformationsCtrl', function($scope, $ionicLoading, ConnectivityMonitor,
+  .controller('InformationsCtrl', function($scope, $ionicLoading,
                                            $localStorage, $cordovaGeolocation) {
 
-    ConnectivityMonitor.startWatching();
+    //ConnectivityMonitor.startWatching();
 
     /*$scope.$watch(function() {
       $scope.isOnlineNetworkWatch = $localStorage.isOnlineNet;
     });*/
 
-    $scope.isOnlineNetworkWatch = $localStorage.isOnlineNet;
+    //$scope.isOnlineNetworkWatch = $localStorage.isOnlineNet;
 
     var posOptions = {timeout: 10000, enableHighAccuracy: false};
     $cordovaGeolocation
@@ -1124,40 +1281,41 @@ angular.module('starter.controllers', [])
     $scope.version = $localStorage.version;
     $scope.model = $localStorage.model;
     $scope.appVersion = $localStorage.appVersion;
-
-
+    $scope.tkatoVersion = $localStorage.TKATOVersion;
   })
 
   .controller('LoginCtrl', function($scope, LoginService, $state, $cordovaDialogs, AlertDialog,
                                     $localStorage, $ionicLoading, $cordovaFileTransfer,
-                                    $timeout, $cordovaFileOpener2, $cordovaToast, ProgressDialog) {
+                                    $timeout, $cordovaFileOpener2, ProgressDialog, VersionService) {
     $localStorage.Token = null;
     $scope.form = {};
     $scope.username = "";
     $scope.password = "";
+    $scope.version = {};
 
-    $scope.showbar = function () {
-      ProgressDialog.setProgressIndicator("Lütfen Bekleyiniz!", "Güncelleme indiriliyor...", false);
-    };
+    $ionicLoading.show();
 
-    $scope.dwnload = function() {
+    var versionUpdate = function(data) {
       document.addEventListener('deviceready', function () {
-        var url = "http://rl.telekurye.com.tr/download/apk/tkato.apk";// "http://192.168.1.27/download/apk/tkato.apk";
+        var url = data.URL;
         var targetPath = cordova.file.externalRootDirectory + "/Download/tkato.apk";
         var trustHosts = true;
         var options = {};
 
-        $scope.showbar();
+        ProgressDialog.setProgressIndicator("Lütfen Bekleyiniz!", "İndirme esnasında uygulamayı kapatmayınız! Güncelleme indirildikten sonra 'YÜKLE' butonuna basınız. Güncelleme indiriliyor...", false);
 
         $cordovaFileTransfer.download(url, targetPath, options, trustHosts)
           .then(function(result) {
             updateApp(result);
           }, function(err) {
-            AlertDialog.setDialogInit(err, 'İndirme başarısız!', 'Tamam');
+            AlertDialog.setDialogInit(err, 'İndirme başarısız!', 'Tamam')
+              .then(function() {
+              ionic.Platform.exitApp();
+            });
           }, function (progress) {
             $timeout(function () {
-              $scope.downloadProgress = parseInt((progress.loaded / progress.total) * 100);
-              ProgressDialog.setProgressPercent($scope.downloadProgress);
+              var downloadProgress = parseInt((progress.loaded / progress.total) * 100);
+              ProgressDialog.setProgressPercent(downloadProgress);
             });
           });
 
@@ -1170,7 +1328,10 @@ angular.module('starter.controllers', [])
         ).then(function() {
           isInstalled();
         }, function(err) {
-          AlertDialog.setDialogInit(err, 'İndirme başarısız!!', 'Tamam');
+          AlertDialog.setDialogInit(err, 'İndirme başarısız!!', 'Tamam')
+            .then(function() {
+            ionic.Platform.exitApp();
+          });
         });
       };
 
@@ -1178,7 +1339,10 @@ angular.module('starter.controllers', [])
         $cordovaFileOpener2.appIsInstalled('io.telekurye.tkato').then(function(res) {
           if (res.status === 0) {
             ProgressDialog.setProgressDismiss();
-            AlertDialog.setDialogInit('TKATO yüklenemedi!', 'Yükleme başarısız!', 'Tamam');
+            AlertDialog.setDialogInit('TKATO yüklenemedi!', 'Yükleme başarısız!', 'Tamam')
+              .then(function() {
+              ionic.Platform.exitApp();
+            });
 
           } else {
             ProgressDialog.setProgressDismiss();
@@ -1187,6 +1351,33 @@ angular.module('starter.controllers', [])
         });
       };
     };
+
+    if($localStorage.isAndroid) {
+      VersionService.check().then(function(data) {
+        $scope.version = data;
+
+        $ionicLoading.hide();
+        if($scope.version != null || $scope.version != undefined || $scope.version != "" || $scope.version != {}) {
+          if($localStorage.TKATOVersion != $scope.version.VersionNumber)
+              versionUpdate(data);
+        }
+        else {
+          $ionicLoading.hide();
+          $cordovaDialogs.alert('Lütfen internet bağlantınızı kontrol ediniz. Versiyon kontrolü yapılamadığı için uygulamaya giriş yapılamamaktadır.', 'Versiyon Kontrol Uyarısı', 'Uygulamadan Çık')
+            .then(function() {
+              ionic.Platform.exitApp();
+            });
+        }
+      }, function(err) {
+        $ionicLoading.hide();
+        $cordovaDialogs.alert('Lütfen internet bağlantınızı kontrol ediniz. Versiyon kontrolü yapılamadığı için uygulamaya giriş yapılamamaktadır.', 'Versiyon Kontrol Uyarısı', 'Uygulamadan Çık')
+          .then(function() {
+            ionic.Platform.exitApp();
+          });
+      });
+    }
+    else
+      $ionicLoading.hide();
 
     $scope.login = function(username, password) {
       $ionicLoading.show();

@@ -7,7 +7,7 @@ angular.module('starter', ['ionic',
     'ngMask'])
 
   .run(function($ionicPlatform, $cordovaDialogs, $cordovaDevice, $localStorage, $rootScope) {
-    //$localStorage.UserId = 79;
+    $localStorage.TKATOVersion = "1.2.0";
 
     $ionicPlatform.ready(function() {
       if(window.Connection) {
@@ -41,6 +41,11 @@ angular.module('starter', ['ionic',
 
     $rootScope.workingOnMission = null;
     $localStorage.previousObjectId = null;
+
+    $localStorage.isWebView = ionic.Platform.isWebView();
+    $localStorage.isIPad = ionic.Platform.isIPad();
+    $localStorage.isIOS = ionic.Platform.isIOS();
+    $localStorage.isAndroid = ionic.Platform.isAndroid();
   })
 
   .config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider,
@@ -94,7 +99,7 @@ angular.module('starter', ['ionic',
 
     //$compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|tel):/);
 
-    $ionicConfigProvider.backButton.text('Geri');
+    $ionicConfigProvider.backButton.text('Geri').icon('ion-arrow-left-c');
   })
 
   .directive('capitalize', function() {
@@ -109,9 +114,35 @@ angular.module('starter', ['ionic',
             modelCtrl.$render();
           }
           return capitalized;
-        }
+        };
         modelCtrl.$parsers.push(capitalize);
         capitalize(scope[attrs.ngModel]); // capitalize initial value
+      }
+    };
+  })
+
+  .directive('emailValidate', function() {
+    return {
+      require: 'ngModel',
+      link: function(scope, elm, attrs, ctrl) {
+        ctrl.$parsers.unshift(function(viewValue) {
+
+          scope.wordAt = viewValue.split("@");
+          scope.isValidEmail = (scope.wordAt && scope.wordAt >= 5 ? 'valid' : undefined);
+
+          if(scope.isValidEmail) {
+            ctrl.$setValidity('valid', true);
+            //elm.$setValidity('pwd', true); //<-- I WANT THIS TO WORK! (or something like it)
+
+            return viewValue;
+          } else {
+            ctrl.$setValidity('noValid', false);
+            //elm.$setValidity('pwd', false); //<-- I WANT THIS TO WORK! (or something like it)
+
+            return undefined;
+          }
+
+        });
       }
     };
   });

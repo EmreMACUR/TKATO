@@ -45,17 +45,17 @@
 
     <ion-list class="background-color-white bottom-list">
       <div ng-if="isPhase1">
-        <button class="button button-energized button-block"
+        <button class="button button-energized button-full"
                 type="button" ng-click="takePhoto(1)" ng-disabled="isNotPhotoBuildingButton">
           Dış Bina Fotoğrafı Çek
         </button>
 
-        <button class="button button-energized button-block"
+        <button class="button button-energized button-full"
                 type="button" ng-click="takePhoto(2)" ng-disabled="isNotPhotoCompanyButton">
           Firma Tabela Fotoğrafı Çek
         </button>
 
-        <button class="button button-energized button-block"
+        <button class="button button-energized button-full"
                 type="button" ng-click="takePhoto(3)" ng-disabled="isNotPhotoTaxButton">
           Vergi Levhası Fotoğrafı Çek
         </button>
@@ -75,7 +75,7 @@
 
         <br/>
 
-        <button class="button button-energized button-block"
+        <button class="button button-energized button-full"
                 type="button" ng-disabled="isStatusChecked"
                 ng-click="statusSelected(status)">
           İleri
@@ -96,7 +96,7 @@
 
         <br/>
 
-        <button class="button button-energized button-block"
+        <button class="button button-energized button-full"
                 type="button" ng-disabled="isDeliveryStatusChecked"
                 ng-click="deliveryStatusChange(deliveriedStatus)">
           İleri
@@ -117,7 +117,7 @@
 
         <br/>
 
-        <button class="button button-energized button-block"
+        <button class="button button-energized button-full"
                 type="button" ng-disabled="isDeliveryStatusChecked"
                 ng-click="deliveryStatusChange(returnStatus)">
           İleri
@@ -130,7 +130,7 @@
 
         <br/>
 
-        <button class="button button-energized button-block"
+        <button class="button button-energized button-full"
                 type="button" ng-click="nextVisitPhase(visitCardChoice)">
           İleri
         </button>
@@ -168,12 +168,12 @@
           <label class="item item-input item-stacked-label">
             <span class="input-label">E-Posta Adresi</span>
             <input type="email" ng-model="noVisitCardEmail" ng-pattern="/^[a-zA-Z0-9&.@_-]*$/"
-                   placeholder="örn. info@firma.com.tr" name="noVisitCardEmail">
+                   placeholder="örn. info@firma.com.tr" name="noVisitCardEmail" emailValidate>
           </label>
 
           <br/>
 
-          <button class="button button-energized button-block" ng-disabled="noVisitCardForm.$invalid"
+          <button class="button button-energized button-full" ng-disabled="noVisitCardForm.$invalid"
                   type="submit">
             İleri
           </button>
@@ -209,18 +209,18 @@
           <label class="item item-input item-stacked-label">
             <span class="input-label">E-Posta Adresi</span>
             <input type="email" ng-model="oneselfEmail" ng-pattern="/^[a-zA-Z0-9&.@_-]*$/"
-                   placeholder="Yetkili Kişi E-Posta Adresi" name="oneselfEmail">
+                   placeholder="Yetkili Kişi E-Posta Adresi" name="oneselfEmail" emailValidate>
           </label>
 
           <ion-checkbox class="checkbox-energized" name="isReceiverEqualOneself"
                         ng-checked="receiverEqualOneself(isReceiverEqualOneself)"
-                        ng-model="isReceiverEqualOneself">
+                        ng-model="isReceiverEqualOneself" ng-if="false">
             İmza Yetkili Kişi ile Görüşülen Kişi Aynı
           </ion-checkbox>
 
           <br/>
 
-          <button class="button button-energized button-block" ng-disabled="oneselfForm.$invalid"
+          <button class="button button-energized button-full" ng-disabled="oneselfForm.$invalid"
                   type="submit">
             İleri
           </button>
@@ -230,11 +230,10 @@
       <div ng-if="isPhase8">
         <form name="accountancyForm"
               ng-submit="accountancyInfos(accountancyNameSurname, accountancyTelNumber, accountancyTckn, accountancyEmail)">
-          <label class="item item-input item-stacked-label"
-                 ng-class="{'has-errors' : accountancyForm.accountancyNameSurname.$invalid && !accountancyForm.accountancyNameSurname.$pristine, 'no-errors' : accountancyForm.accountancyNameSurname.$valid}">
+          <label class="item item-input item-stacked-label">
             <span class="input-label">Ad Soyad</span>
             <input type="text" ng-minlength="2" ng-model="accountancyNameSurname"
-                   placeholder="Muhasebe Yetkili Kişi Ad Soyad" name="accountancyNameSurname" capitalize required>
+                   placeholder="Muhasebe Yetkili Kişi Ad Soyad" name="accountancyNameSurname" capitalize>
           </label>
 
           <label class="item item-input item-stacked-label">
@@ -254,12 +253,12 @@
           <label class="item item-input item-stacked-label">
             <span class="input-label">E-Posta Adresi</span>
             <input type="email" ng-model="accountancyEmail" ng-pattern="/^[a-zA-Z0-9&.@_-]*$/"
-                   placeholder="Muhasebe Yetkili Kişi E-Posta Adresi" name="accountancyEmail">
+                   placeholder="Muhasebe Yetkili Kişi E-Posta Adresi" name="accountancyEmail" emailValidate>
           </label>
 
           <br/>
 
-          <button class="button button-energized button-block" ng-disabled="accountancyForm.$invalid"
+          <button class="button button-energized button-full" ng-disabled="accountancyForm.$invalid"
                   type="submit">
             İleri
           </button>
@@ -293,12 +292,12 @@
           <label class="item item-input item-stacked-label">
             <span class="input-label">E-posta</span>
             <input type="email" placeholder="Görüşülen Kişi E-posta Adresi" ng-pattern="/^[a-zA-Z0-9&.@_-]*$/"
-                   ng-model="receiverEmail" name="receiverEmail">
+                   ng-model="receiverEmail" name="receiverEmail" emailValidate>
           </label>
 
           <br/>
 
-          <button class="button button-energized button-block" ng-disabled="receiverForm.$invalid"
+          <button class="button button-energized button-full" ng-disabled="receiverForm.$invalid"
                   type="submit">
             İleri
           </button>
@@ -306,18 +305,18 @@
       </div>
 
       <div ng-if="isPhase10">
-        <button class="button button-energized button-block"
+        <button class="button button-energized button-full"
                 type="button" ng-click="takePhoto(4)" ng-disabled="isNotPhotoBusinessCardButton">
           Kartvizit Fotoğrafı Çek
         </button>
-        <button class="button button-energized button-block"
+        <button class="button button-energized button-full"
                 type="button" ng-click="takePhoto(5)" ng-disabled="isNotPhotoSignatureButton">
           Kaşe Fotoğrafı Çek
         </button>
       </div>
 
       <div ng-if="isPhase11">
-        <button class="button button-energized button-block"
+        <button class="button button-energized button-full"
                 type="button" ng-click="sendSms();selectTimer(180);startTimer();modal.show();">
           Sms Onayı
         </button>
@@ -627,7 +626,7 @@
 
         <br/>
 
-        <button class="button button-energized button-block"
+        <button class="button button-energized button-full"
                 type="button" ng-click="confirmMission()">
           Görevi Tamamla
         </button>

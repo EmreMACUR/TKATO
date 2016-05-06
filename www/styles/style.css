@@ -1,5 +1,13 @@
 /* Empty. Add your own CSS if you like */
 
+.h4 {
+  color: #116262 !important;
+  font-size: 20px !important;
+  margin-bottom: 16px !important;
+}
+
+/* Empty. Add your own CSS if you like */
+
 .clear-search {
   font-size: 18px;
 }

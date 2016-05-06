@@ -1,9 +1,9 @@
-<ion-view view-title="Ayarlar">
+<ion-view view-title="Bilgiler">
   <ion-content>
-    <div class="item item-divider">
+    <div class="item item-divider" ng-if="false">
       Ağ Bilgileri
     </div>
-    <ul>
+    <ul ng-if="false">
       <ion-toggle ng-model="isOnlineNetwork" toggle-class="toggle-balanced"
                   ng-disabled="true" ng-checked="isOnlineNetwork">İnternet Erişimi</ion-toggle>
       <a class="item item-icon-left" href="#" ng-disabled="true">
@@ -20,7 +20,7 @@
     <ul>
       <ion-toggle toggle-class="toggle-balanced" ng-disabled="true"
                   ng-checked="dbInfo.sqlite_plugin">SQLite Erişimi</ion-toggle>
-      <a class="item item-icon-left" href="#" ng-disabled="true">
+      <a class="item item-icon-left" href="#/tab/informations" ng-disabled="true">
         <i class="icon ion-android-cloud-circle"></i>
         Veritabanı Bağlantısı
           <span class="item-note">
@@ -32,14 +32,14 @@
       Lokasyon Bilgileri
     </div>
     <ul>
-      <a class="item item-icon-left" href="#" ng-disabled="true">
+      <a class="item item-icon-left" href="#/tab/informations" ng-disabled="true">
         <i class="icon ion-android-locate"></i>
         Enlem
           <span class="item-note">
             {{latitude}}
           </span>
       </a>
-      <a class="item item-icon-left" href="#" ng-disabled="true">
+      <a class="item item-icon-left" href="#/tab/informations" ng-disabled="true">
         <i class="icon ion-android-locate"></i>
         Boylam
           <span class="item-note">
@@ -51,7 +51,7 @@
       Cihaz Bilgileri
     </div>
     <ul>
-      <a class="item" href="#" ng-disabled="true">
+      <a class="item" href="#/tab/informations" ng-disabled="true">
         Model
           <span class="item-note">
             {{model}}
@@ -79,6 +79,12 @@
         Uygulama Versiyonu
           <span class="item-note">
             {{appVersion}}
+          </span>
+      </a>
+      <a class="item" href="#" ng-disabled="true">
+        Yazılım Versiyonu
+          <span class="item-note">
+            {{tkatoVersion}}
           </span>
       </a>
     </ul>

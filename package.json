@@ -33,7 +33,7 @@
     "jshint-stylish": "~1.0.0",
     "load-grunt-tasks": "~3.1.0",
     "time-grunt": "~1.0.0",
-    "cordova": "~4.2.0",
+    "cordova": "~6.1.1",
     "lodash": "~3.1.0",
     "mkdirp": "~0.5.0",
     "ncp": "~1.0.1",
@@ -56,10 +56,6 @@
     "cordova-plugin-whitelist@1",
     "cordova-plugin-whitelist",
     "cordova-plugin-device",
-    "cordova-plugin-sqlite",
-    "https://github.com/pwlin/cordova-plugin-file-opener2.git",
-    "https://github.com/pbernasconi/cordova-progressIndicator.git",
-    "https://github.com/EddyVerbruggen/Toast-PhoneGap-Plugin.git",
-    "cordova-plugin-pdialog"
+    "cordova-plugin-sqlite"
   ]
 }

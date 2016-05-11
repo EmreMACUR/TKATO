@@ -1,8 +1,8 @@
 angular.module('starter.controllers', [])
 
   .controller('DistsCtrl', function($scope, $ionicLoading, $pouchDB, $localStorage,
-                                    $rootScope, $filter, Server, $cordovaDialogs) {
-    $pouchDB.setDatabase("syncDatabase");
+                                    $rootScope, $filter, Server) {
+    $pouchDB.setDatabase("syncDatabase" + $localStorage.UserId);
     $pouchDB.sync(Server.CouchDevelopment + $localStorage.UserId);
     //$pouchDB.sync(Server.CouchProduct + $localStorage.UserId);
     $pouchDB.startListening();
@@ -762,7 +762,7 @@ angular.module('starter.controllers', [])
       var options = {
         destinationType: Camera.DestinationType.DATA_URL,
         sourceType: Camera.PictureSourceType.CAMERA,
-        allowEdit: true,
+        allowEdit: false,
         targetWidth: 1500,
         targetHeight: 1500,
         encodingType: Camera.EncodingType.JPEG,
@@ -774,7 +774,7 @@ angular.module('starter.controllers', [])
         options = {
           destinationType: Camera.DestinationType.DATA_URL,
           sourceType: Camera.PictureSourceType.CAMERA,
-          allowEdit: true,
+          allowEdit: false,
           targetWidth: 1000,
           targetHeight: 1000,
           encodingType: Camera.EncodingType.JPEG,
@@ -786,7 +786,7 @@ angular.module('starter.controllers', [])
         base64toBlobData(imageData, clickStatus);
         //saveOutsideImage(imageData, clickStatus);
       }, function (error) {
-        warningShow("Cihazdaki kamera bilgisi hata verdi. Lütfen Tekrar fotoğraf çekiniz.");
+        //warningShow("Cihazdaki kamera bilgisi hata verdi. Lütfen Tekrar fotoğraf çekiniz.");
       });
     };
 
@@ -1255,8 +1255,8 @@ angular.module('starter.controllers', [])
     }
   })
 
-  .controller('InformationsCtrl', function($scope, $ionicLoading,
-                                           $localStorage, $cordovaGeolocation) {
+  .controller('InformationsCtrl', function($scope, $ionicLoading, InformationService,
+                                           $localStorage, $cordovaGeolocation, $cordovaDialogs) {
 
     //ConnectivityMonitor.startWatching();
 
@@ -1266,22 +1266,52 @@ angular.module('starter.controllers', [])
 
     //$scope.isOnlineNetworkWatch = $localStorage.isOnlineNet;
 
-    var posOptions = {timeout: 10000, enableHighAccuracy: false};
-    $cordovaGeolocation
-      .getCurrentPosition(posOptions)
-      .then(function (position) {
-        $scope.latitude  = position.coords.latitude;
-        $scope.longitude = position.coords.longitude;
+    $scope.getDatas = function () {
+      $ionicLoading.show();
+
+      InformationService.getData($localStorage.UserId).then(function(data) {
+        $ionicLoading.hide();
+
+        $scope.information = data;
+
+        if($scope.information != null || $scope.information != undefined || $scope.information != "" || $scope.information != {}) {
+          $scope.information = data.Information;
+        }
+        else {
+          $cordovaDialogs.alert('Kullanıcı bilgisi sunucu tarafından doğrulanamadı.', 'Hakediş Bilgisi Çekilemedi', 'Tamam');
+        }
       }, function(err) {
-        // error
+        $cordovaDialogs.alert('' + err, 'Hakediş Bilgisi Çekilemedi', 'Tamam');
+      })
+      .finally(function() {
+        $scope.$broadcast('scroll.refreshComplete');
+        $ionicLoading.hide();
       });
 
-    $scope.platform = $localStorage.platform;
-    $scope.uuid = $localStorage.uuid;
-    $scope.version = $localStorage.version;
-    $scope.model = $localStorage.model;
-    $scope.appVersion = $localStorage.appVersion;
-    $scope.tkatoVersion = $localStorage.TKATOVersion;
+      var posOptions = {timeout: 10000, enableHighAccuracy: false};
+      $cordovaGeolocation
+        .getCurrentPosition(posOptions)
+        .then(function (position) {
+          $scope.latitude  = position.coords.latitude;
+          $scope.longitude = position.coords.longitude;
+        }, function(err) {
+          // error
+        });
+
+      $scope.platform = $localStorage.platform;
+      $scope.uuid = $localStorage.uuid;
+      $scope.version = $localStorage.version;
+      $scope.model = $localStorage.model;
+      $scope.appVersion = $localStorage.appVersion;
+      $scope.tkatoVersion = $localStorage.TKATOVersion;
+    };
+
+    $scope.doRefresh = function() {
+      $scope.getDatas();
+    };
+
+    $scope.getDatas();
+
   })
 
   .controller('LoginCtrl', function($scope, LoginService, $state, $cordovaDialogs, AlertDialog,
@@ -1292,6 +1322,7 @@ angular.module('starter.controllers', [])
     $scope.username = "";
     $scope.password = "";
     $scope.version = {};
+    $scope.information = {};
 
     $ionicLoading.show();
 

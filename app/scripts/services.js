@@ -5,12 +5,12 @@ angular.module('starter.services', [])
     number: 2000
   })
 
-  /*.constant('Server', {
+ .constant('Server', {
    Development : 'XXX',
    Product: 'XXX',
    CouchDevelopment: 'XXX',
    CouchProduct: 'XXX'
-   })*/
+   })
 
   .service("$pouchDB", ["$rootScope", "$q", "$localStorage", "$cordovaDialogs",
     function($rootScope, $q, $localStorage, $cordovaDialogs) {
@@ -28,6 +28,7 @@ angular.module('starter.services', [])
     var database;
     var changeListener;
     var isMissionContinious = false;
+    var minDate, maxDate, nowDate =  new Date().addDays(1).addHours(-21).toISOString().slice(0, 19), courierId;
 
     this.setDatabase = function(databaseName) {
       database = new PouchDB(databaseName, {adapter: 'websql', auto_compaction: true});
@@ -38,14 +39,14 @@ angular.module('starter.services', [])
         live: true,
         include_docs: true
       }).on("change", function(change) {
-        var minDate, maxDate, nowDate =  new Date().addDays(1).addHours(-21).toISOString().slice(0, 19), courierId;
+
         if(!change.deleted) {
           $rootScope.$broadcast("$pouchDB:change", change);
           courierId = "" + change.doc.CourierId;
 
           if(courierId != $localStorage.UserId)
             deleteNonDb(change.doc._id);
-          else {
+          else if(nowDate != "" || nowDate != null || nowDate != undefined || nowDate != NaN) {
             minDate = Date.parse(change.doc.OperationDate.MinDate);
             maxDate = Date.parse(change.doc.OperationDate.MaxDate);
             nowDate = Date.parse(nowDate);
@@ -57,6 +58,7 @@ angular.module('starter.services', [])
 
         } else {
           $rootScope.$broadcast("$pouchDB:delete", change);
+
         }
         getDbInfo().then(function(response) {
           $rootScope.dbInfo = response;
@@ -337,7 +339,7 @@ angular.module('starter.services', [])
 
         $http({
           method: 'POST',
-          url: Server.Development + 'ATO/token', // 'http://rlservice.telekurye.com.tr/token',
+          url: Server.Development + 'ATO/token',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded'},
           data: 'grant_type=password&username=' + name + '&password=' + pw
         })
@@ -453,4 +455,44 @@ angular.module('starter.services', [])
         return promise;
       }
     }
-  });
+  })
+
+  .service('InformationService', function($q, $http, $localStorage, Server) {
+  return {
+    getData: function(userId) {
+      var deferred = $q.defer();
+      var promise = deferred.promise;
+
+      var datas = null;
+
+      $http.get(Server.Development + 'ATOVersionCheck/Api/Information?userId=' + userId).
+      success(function(data, status, headers, config) {
+        if(status != 200)
+          deferred.reject(null);
+        else {
+          datas = data;
+
+          if (datas) {
+            deferred.resolve(datas);
+          } else {
+            deferred.reject(null);
+          }
+        }
+      }).
+      error(function (data, status) {
+        datas = null;
+        deferred.reject(data);
+      });
+
+      promise.success = function(fn) {
+        promise.then(fn);
+        return promise;
+      };
+      promise.error = function(fn) {
+        promise.then(null, fn);
+        return promise;
+      };
+      return promise;
+    }
+  }
+});

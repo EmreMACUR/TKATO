@@ -1,5 +1,28 @@
 <ion-view view-title="Bilgiler">
+  <ion-nav-buttons side="right">
+    <button class="right button button-clear button-positive" ng-click="getDatas()">
+      Bilgileri Güncelle
+    </button>
+  </ion-nav-buttons>
   <ion-content>
+    <ion-refresher
+      pulling-text="Lütfen Bekleyiniz..."
+      on-refresh="doRefresh()">
+    </ion-refresher>
+
+    <div class="item item-divider">
+      <label class="float-left divider-text">Hakediş Bilgileri</label>
+    </div>
+    <ul>
+      <a class="item" href="#/tab/informations" ng-repeat="info in information"
+         ng-disabled="true">
+        {{info.Label}}
+          <span class="item-note">
+            {{info.Description}}
+          </span>
+      </a>
+    </ul>
+
     <div class="item item-divider" ng-if="false">
       Ağ Bilgileri
     </div>

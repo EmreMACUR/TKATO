@@ -4,18 +4,18 @@ angular.module('starter.services', [])
     template: '<ion-spinner></ion-spinner><br/>Lütfen Bekleyiniz...',
     number: 2000
   })
-  .constant('Server', {
+  /*.constant('Server', {
     Development : 'http://rlservice.telekurye.com.tr/',
     Product: 'http://192.168.1.175/',
     CouchDevelopment: 'http://couchdb.telekurye.com.tr:5984/db_',
     CouchProduct: 'http://192.168.1.8:5984/db_'
-  })
-  /*.constant('Server', {
+  })*/
+  .constant('Server', {
    Product: 'http://rlservice.telekurye.com.tr/',
    Development: 'http://192.168.1.175/',
    CouchProduct: 'http://couchdb.telekurye.com.tr:5984/db_',
    CouchDevelopment: 'http://192.168.1.35:5984/db_'
-   })*/
+   })
   /*.constant('Server', {
    Development : 'XXX',
    Product: 'XXX',
@@ -50,6 +50,7 @@ angular.module('starter.services', [])
         include_docs: true
       }).on("change", function(change) {
         var minDate, maxDate, nowDate =  new Date().addDays(1).addHours(-21).toISOString().slice(0, 19), courierId;
+
         if(!change.deleted) {
           $rootScope.$broadcast("$pouchDB:change", change);
           courierId = "" + change.doc.CourierId;
@@ -68,6 +69,7 @@ angular.module('starter.services', [])
 
         } else {
           $rootScope.$broadcast("$pouchDB:delete", change);
+
         }
         getDbInfo().then(function(response) {
           $rootScope.dbInfo = response;
@@ -348,7 +350,7 @@ angular.module('starter.services', [])
 
         $http({
           method: 'POST',
-          url: Server.Development + 'ATO/token', // 'http://rlservice.telekurye.com.tr/token',
+          url: Server.Development + 'ATO/token',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded'},
           data: 'grant_type=password&username=' + name + '&password=' + pw
         })
@@ -390,7 +392,7 @@ angular.module('starter.services', [])
     }
   })
 
-  .service('UserService', function($q, $http, $localStorage, Server) {
+  .service('UserService', function($q, $http, $localStorage, Server, $cordovaDialogs) {
     return {
       userInfos: function(name, pw) {
         var deferred = $q.defer();
@@ -401,6 +403,8 @@ angular.module('starter.services', [])
         $http.get(Server.Development + 'ATO/UserInfo/Details/?username=' + name + '&password=' + pw).
         success(function(data, status, headers, config) {
             $localStorage.UserId = "" + data;
+
+          $cordovaDialogs.alert('' + Server.CouchDevelopment + $localStorage.UserId, 'Database', 'Tamam');
 
             if ($localStorage.UserId) {
               deferred.resolve($localStorage.UserId);
@@ -464,4 +468,44 @@ angular.module('starter.services', [])
         return promise;
       }
     }
-  });
+  })
+
+  .service('InformationService', function($q, $http, $localStorage, Server, $cordovaDialogs) {
+  return {
+    getData: function(userId) {
+      var deferred = $q.defer();
+      var promise = deferred.promise;
+
+      var datas = null;
+
+      $http.get(Server.Development + 'ATOVersionCheck/Api/Information?userId=' + userId).
+      success(function(data, status, headers, config) {
+        if(status != 200)
+          deferred.reject(null);
+        else {
+          datas = data;
+
+          if (datas) {
+            deferred.resolve(datas);
+          } else {
+            deferred.reject(null);
+          }
+        }
+      }).
+      error(function (data, status) {
+        datas = null;
+        deferred.reject(data);
+      });
+
+      promise.success = function(fn) {
+        promise.then(fn);
+        return promise;
+      };
+      promise.error = function(fn) {
+        promise.then(null, fn);
+        return promise;
+      };
+      return promise;
+    }
+  }
+});

@@ -7,7 +7,7 @@
       "ngstorage": "~0.3.10",
       "angular-svg-round-progressbar": "~0.3.10",
       "moment": "~2.11.1",
-      "pouchdb": "~5.3.2",
+      "pouchdb": "^5.3.2",
       "ngMask": "angular-mask#~3.0.16",
       "blob-util": "^1.2.1"
   },

@@ -7,7 +7,7 @@ angular.module('starter', ['ionic',
     'ngMask'])
 
   .run(function($ionicPlatform, $cordovaDialogs, $cordovaDevice, $localStorage, $rootScope) {
-    $localStorage.TKATOVersion = "1.2.3";
+    $localStorage.TKATOVersion = "1.2.1";
 
     $ionicPlatform.ready(function() {
       if(window.Connection) {

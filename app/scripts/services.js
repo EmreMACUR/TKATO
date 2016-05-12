@@ -4,13 +4,12 @@ angular.module('starter.services', [])
     template: '<ion-spinner></ion-spinner><br/>Lütfen Bekleyiniz...',
     number: 2000
   })
-
- .constant('Server', {
+  /*.constant('Server', {
    Development : 'XXX',
    Product: 'XXX',
    CouchDevelopment: 'XXX',
    CouchProduct: 'XXX'
-   })
+   })*/
 
   .service("$pouchDB", ["$rootScope", "$q", "$localStorage", "$cordovaDialogs",
     function($rootScope, $q, $localStorage, $cordovaDialogs) {
@@ -28,7 +27,6 @@ angular.module('starter.services', [])
     var database;
     var changeListener;
     var isMissionContinious = false;
-    var minDate, maxDate, nowDate =  new Date().addDays(1).addHours(-21).toISOString().slice(0, 19), courierId;
 
     this.setDatabase = function(databaseName) {
       database = new PouchDB(databaseName, {adapter: 'websql', auto_compaction: true});
@@ -39,21 +37,24 @@ angular.module('starter.services', [])
         live: true,
         include_docs: true
       }).on("change", function(change) {
+        $rootScope.minDate, $rootScope.maxDate, $rootScope.nowDate =  new Date().addDays(1).addHours(-21).toISOString().slice(0, 19), $rootScope.courierId;
 
         if(!change.deleted) {
           $rootScope.$broadcast("$pouchDB:change", change);
-          courierId = "" + change.doc.CourierId;
+          $rootScope.courierId = "" + change.doc.CourierId;
 
-          if(courierId != $localStorage.UserId)
+          if($rootScope.courierId != $localStorage.UserId)
             deleteNonDb(change.doc._id);
-          else if(nowDate != "" || nowDate != null || nowDate != undefined || nowDate != NaN) {
-            minDate = Date.parse(change.doc.OperationDate.MinDate);
-            maxDate = Date.parse(change.doc.OperationDate.MaxDate);
-            nowDate = Date.parse(nowDate);
-            if(minDate <= nowDate && nowDate <= maxDate)
-              console.log();
-            else
-              deleteNonDb(change.doc._id);
+          else if($rootScope.nowDate != "" || $rootScope.nowDate != null || $rootScope.nowDate != undefined || $rootScope.nowDate != NaN) {
+            $rootScope.minDate = Date.parse(change.doc.OperationDate.MinDate);
+            $rootScope.maxDate = Date.parse(change.doc.OperationDate.MaxDate);
+            $rootScope.nowDate = Date.parse($rootScope.nowDate);
+            if($rootScope.nowDate != "" || $rootScope.nowDate != null || $rootScope.nowDate != undefined || $rootScope.nowDate != NaN) {
+              if($rootScope.minDate <= $rootScope.nowDate && $rootScope.nowDate <= $rootScope.maxDate)
+                console.log();
+              else
+                deleteNonDb(change.doc._id);
+            }
           }
 
         } else {

@@ -2,7 +2,7 @@ angular.module('starter.controllers', [])
 
   .controller('DistsCtrl', function($scope, $ionicLoading, $pouchDB, $localStorage,
                                     $rootScope, $filter, Server) {
-    $pouchDB.setDatabase("syncDatabase" + $localStorage.UserId);
+    $pouchDB.setDatabase("syncDatabase_" + $localStorage.UserId);
     $pouchDB.sync(Server.CouchDevelopment + $localStorage.UserId);
     //$pouchDB.sync(Server.CouchProduct + $localStorage.UserId);
     $pouchDB.startListening();
@@ -25,6 +25,7 @@ angular.module('starter.controllers', [])
       delete $scope.items[data.doc._id];
       $scope.$apply();
     });
+
   })
 
   .controller('DistDetailCtrl', function($scope, $stateParams, $pouchDB, $rootScope, $q,
@@ -199,8 +200,20 @@ angular.module('starter.controllers', [])
       $cordovaDialogs.alert(txt, 'Uyarı', 'Tamam')
     };
 
-    var phaseList = ['phase1', 'phase2', 'phase3', 'phase4', 'phase5', 'phase6', 'phase7', 'phase8', 'phase9', 'phase10', 'phase11', 'phase12'];
-
+    var startPhases = function () {
+      $scope.isPhase1 = false;
+      $scope.isPhase2 = false;
+      $scope.isPhase3 = false;
+      $scope.isPhase4 = false;
+      $scope.isPhase5 = false;
+      $scope.isPhase6 = false;
+      $scope.isPhase7 = false;
+      $scope.isPhase8 = false;
+      $scope.isPhase9 = false;
+      $scope.isPhase10 = false;
+      $scope.isPhase11 = false;
+      $scope.isPhase12 = false;
+    };
     var phase0 = function() {
       $scope.isLoading = true;
       $scope.isOutsideMinPhotoCount = true;
@@ -214,184 +227,63 @@ angular.module('starter.controllers', [])
       $scope.isNotPhotoSignatureButton = false;
     };
     var phase1 = function() {
+      startPhases();
       $scope.phaseDescription = "Mekan Fotoğraf Çekimi";
       $scope.isPhase1 = true;
-      $scope.isPhase2 = false;
-      $scope.isPhase3 = false;
-      $scope.isPhase4 = false;
-      $scope.isPhase5 = false;
-      $scope.isPhase6 = false;
-      $scope.isPhase7 = false;
-      $scope.isPhase8 = false;
-      $scope.isPhase9 = false;
-      $scope.isPhase10 = false;
-      $scope.isPhase11 = false;
-      $scope.isPhase12 = false;
     };
     var phase2 = function() {
+      startPhases();
       $scope.phaseDescription = "Statü Seçimi";
-      $scope.isPhase1 = false;
       $scope.isPhase2 = true;
-      $scope.isPhase3 = false;
-      $scope.isPhase4 = false;
-      $scope.isPhase5 = false;
-      $scope.isPhase6 = false;
-      $scope.isPhase7 = false;
-      $scope.isPhase8 = false;
-      $scope.isPhase9 = false;
-      $scope.isPhase10 = false;
-      $scope.isPhase11 = false;
-      $scope.isPhase12 = false;
     };
     var phase3 = function() {
+      startPhases();
       $scope.phaseDescription = "Güncellendi Statü Seçimi";
-      $scope.isPhase1 = false;
-      $scope.isPhase2 = false;
       $scope.isPhase3 = true;
-      $scope.isPhase4 = false;
-      $scope.isPhase5 = false;
-      $scope.isPhase6 = false;
-      $scope.isPhase7 = false;
-      $scope.isPhase8 = false;
-      $scope.isPhase9 = false;
-      $scope.isPhase10 = false;
-      $scope.isPhase11 = false;
-      $scope.isPhase12 = false;
     };
     var phase4 = function() {
+      startPhases();
       $scope.phaseDescription = "Güncellenemedi Statü Seçimi";
-      $scope.isPhase1 = false;
-      $scope.isPhase2 = false;
-      $scope.isPhase3 = false;
       $scope.isPhase4 = true;
-      $scope.isPhase5 = false;
-      $scope.isPhase6 = false;
-      $scope.isPhase7 = false;
-      $scope.isPhase8 = false;
-      $scope.isPhase9 = false;
-      $scope.isPhase10 = false;
-      $scope.isPhase11 = false;
-      $scope.isPhase12 = false;
     };
     var phase5 = function() {
+      startPhases();
       $scope.phaseDescription = "Kartvizit Seçimi";
-      $scope.isPhase1 = false;
-      $scope.isPhase2 = false;
-      $scope.isPhase3 = false;
-      $scope.isPhase4 = false;
       $scope.isPhase5 = true;
-      $scope.isPhase6 = false;
-      $scope.isPhase7 = false;
-      $scope.isPhase8 = false;
-      $scope.isPhase9 = false;
-      $scope.isPhase10 = false;
-      $scope.isPhase11 = false;
-      $scope.isPhase12 = false;
     };
     var phase6 = function() {
+      startPhases();
       $scope.phaseDescription = "Firma Bilgileri";
-      $scope.isPhase1 = false;
-      $scope.isPhase2 = false;
-      $scope.isPhase3 = false;
-      $scope.isPhase4 = false;
-      $scope.isPhase5 = false;
       $scope.isPhase6 = true;
-      $scope.isPhase7 = false;
-      $scope.isPhase8 = false;
-      $scope.isPhase8 = false;
-      $scope.isPhase9 = false;
-      $scope.isPhase10 = false;
-      $scope.isPhase11 = false;
-      $scope.isPhase12 = false;
     };
     var phase7 = function() {
+      startPhases();
       $scope.phaseDescription = "İmza Yetkili Kişi Bilgileri";
-      $scope.isPhase1 = false;
-      $scope.isPhase2 = false;
-      $scope.isPhase3 = false;
-      $scope.isPhase4 = false;
-      $scope.isPhase5 = false;
-      $scope.isPhase6 = false;
       $scope.isPhase7 = true;
-      $scope.isPhase8 = false;
-      $scope.isPhase9 = false;
-      $scope.isPhase10 = false;
-      $scope.isPhase11 = false;
-      $scope.isPhase12 = false;
     };
     var phase8 = function() {
+      startPhases();
       $scope.phaseDescription = "Muhasebe Yetkili Kişi Bilgileri";
-      $scope.isPhase1 = false;
-      $scope.isPhase2 = false;
-      $scope.isPhase3 = false;
-      $scope.isPhase4 = false;
-      $scope.isPhase5 = false;
-      $scope.isPhase6 = false;
-      $scope.isPhase7 = false;
       $scope.isPhase8 = true;
-      $scope.isPhase9 = false;
-      $scope.isPhase10 = false;
-      $scope.isPhase11 = false;
-      $scope.isPhase12 = false;
     };
     var phase9 = function() {
+      startPhases();
       $scope.phaseDescription = "Görüşülen Kişi Bilgileri";
-      $scope.isPhase1 = false;
-      $scope.isPhase2 = false;
-      $scope.isPhase3 = false;
-      $scope.isPhase4 = false;
-      $scope.isPhase5 = false;
-      $scope.isPhase6 = false;
-      $scope.isPhase7 = false;
-      $scope.isPhase8 = false;
       $scope.isPhase9 = true;
-      $scope.isPhase10 = false;
-      $scope.isPhase11 = false;
-      $scope.isPhase12 = false;
     };
     var phase10 = function() {
+      startPhases();
       $scope.phaseDescription = "Döküman Fotoğraf Çekimi";
-      $scope.isPhase1 = false;
-      $scope.isPhase2 = false;
-      $scope.isPhase3 = false;
-      $scope.isPhase4 = false;
-      $scope.isPhase5 = false;
-      $scope.isPhase6 = false;
-      $scope.isPhase7 = false;
-      $scope.isPhase8 = false;
-      $scope.isPhase9 = false;
       $scope.isPhase10 = true;
-      $scope.isPhase11 = false;
-      $scope.isPhase12 = false;
     };
     var phase11 = function() {
+      startPhases();
       $scope.phaseDescription = "Sms Onayı";
-      $scope.isPhase1 = false;
-      $scope.isPhase2 = false;
-      $scope.isPhase3 = false;
-      $scope.isPhase4 = false;
-      $scope.isPhase5 = false;
-      $scope.isPhase6 = false;
-      $scope.isPhase7 = false;
-      $scope.isPhase8 = false;
-      $scope.isPhase9 = false;
-      $scope.isPhase10 = false;
       $scope.isPhase11 = true;
-      $scope.isPhase12 = false;
     };
     var phase12 = function() {
+      startPhases();
       $scope.phaseDescription = "Genel Bilgi Gösterimi";
-      $scope.isPhase1 = false;
-      $scope.isPhase2 = false;
-      $scope.isPhase3 = false;
-      $scope.isPhase4 = false;
-      $scope.isPhase5 = false;
-      $scope.isPhase6 = false;
-      $scope.isPhase7 = false;
-      $scope.isPhase8 = false;
-      $scope.isPhase9 = false;
-      $scope.isPhase10 = false;
-      $scope.isPhase11 = false;
       $scope.isPhase12 = true;
     };
     $scope.next = function(phase) {
@@ -419,7 +311,6 @@ angular.module('starter.controllers', [])
         phase11();
       else if(phase == 12)
         phase12();
-
     };
 
     var loadData = function(document) {

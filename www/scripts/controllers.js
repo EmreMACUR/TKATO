@@ -843,7 +843,7 @@ angular.module('starter.controllers', [])
         if ($scope.deliveryStatus == true)
           saveDB(FeedbackResult, "Statü kaydedildi!", 5);
         else if ($scope.deliveryStatus == false)
-          saveDB(FeedbackResult, "Statü kaydedildi!", 11);
+          saveDB(FeedbackResult, "Statü kaydedildi!", 12);
       }
       else
         warningShow("Lütfen statü seçiniz!");

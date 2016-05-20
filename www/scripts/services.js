@@ -24,7 +24,7 @@ angular.module('starter.services', [])
    })*/
 
   .service("$pouchDB", ["$rootScope", "$q", "$localStorage", "$cordovaDialogs",
-    function($rootScope, $q, $localStorage, $cordovaDialogs) {
+    function($rootScope, $q, $localStorage, $cordovaDialogs, ToastService, Server) {
       Date.prototype.addHours= function(h){
         this.setHours(this.getHours()+h);
         return this;
@@ -44,7 +44,53 @@ angular.module('starter.services', [])
       database = new PouchDB(databaseName, {adapter: 'websql', auto_compaction: true});
     };
 
+    var setDatabase = function(databaseName) {
+      database = new PouchDB(databaseName, {adapter: 'websql', auto_compaction: true});
+    };
+
     this.startListening = function() {
+      changeListener = database.changes({
+        live: true,
+        include_docs: true
+      }).on("change", function(change) {
+        $rootScope.minDate, $rootScope.maxDate,
+        $rootScope.nowDate =  new Date().addDays(1).addHours(-21).toISOString().slice(0, 19),
+        $rootScope.courierId;
+
+        if(!change.deleted) {
+          $rootScope.$broadcast("$pouchDB:change", change);
+          $rootScope.courierId = "" + change.doc.CourierId;
+
+          if($rootScope.courierId != $localStorage.UserId)
+            deleteNonDb(change.doc._id);
+          else if($rootScope.nowDate != "" || $rootScope.nowDate != null || $rootScope.nowDate != undefined || $rootScope.nowDate != NaN) {
+            $rootScope.minDate = Date.parse(change.doc.OperationDate.MinDate);
+            $rootScope.maxDate = Date.parse(change.doc.OperationDate.MaxDate);
+            $rootScope.nowDate = Date.parse($rootScope.nowDate);
+            if($rootScope.nowDate != "" || $rootScope.nowDate != null || $rootScope.nowDate != undefined || $rootScope.nowDate != NaN) {
+              if($rootScope.minDate <= $rootScope.nowDate && $rootScope.nowDate <= $rootScope.maxDate)
+                console.log();
+              else
+                deleteNonDb(change.doc._id);
+            }
+          }
+
+        } else {
+          $rootScope.$broadcast("$pouchDB:delete", change);
+        }
+        getDbInfo().then(function(response) {
+          $rootScope.dbInfo = response;
+          $rootScope.distCount = response.doc_count;
+          //missionContinious(response.doc_count);
+        });
+        cleanup();
+        compact();
+      }).on('error', function (err) {
+        ToastService.setToastInit("Görevlerin Senkronizasyonu Esnasında Hata Oluştu", "long", "top");
+      });
+    };
+
+    var startListening = function() {
       changeListener = database.changes({
         live: true,
         include_docs: true
@@ -80,6 +126,8 @@ angular.module('starter.services', [])
         });
         cleanup();
         compact();
+      }).on('error', function (err) {
+        ToastService.setToastInit("Görevlerin Senkronizasyonu Esnasında Hata Oluştu", "long", "top");
       });
     };
 
@@ -116,11 +164,43 @@ angular.module('starter.services', [])
       return deferred.promise;
     };
 
+    var sync = function(remoteDatabase) {
+      if($localStorage.UserId != 0 && $localStorage.UserId != null)
+        database.sync(remoteDatabase, {
+            live: true,
+            retry: true})
+          .on('error', function (err) {
+            $cordovaDialogs.alert('Senkronizasyon sırasında ana sunucuya bağlanamadı. Lütfen tekrar deneyin.', 'Sunucu Hatası!', 'Tamam')
+              .then(function () {
+                setDatabase("syncDatabase" + $localStorage.UserId);
+                sync(Server.CouchDevelopment + $localStorage.UserId);
+                startListening();
+            });
+
+          });
+      else
+        $cordovaDialogs.alert('Senkronizasyon sırasında ana sunucuya bağlanamadı. Lütfen tekrar deneyin.', 'Sunucu Hatası!', 'Tamam');
+
+      getDbInfo().then(function(response) {
+        $rootScope.dbInfo = response;
+        $rootScope.distCount = response.doc_count;
+      });
+    };
+
     this.sync = function(remoteDatabase) {
       if($localStorage.UserId != 0 && $localStorage.UserId != null)
         database.sync(remoteDatabase, {
           live: true,
-          retry: true});
+          retry: true})
+          .on('error', function (err) {
+            $cordovaDialogs.alert('Senkronizasyon sırasında ana sunucuya bağlanamadı. Lütfen tekrar deneyin.', 'Sunucu Hatası!', 'Tamam')
+              .then(function () {
+                setDatabase("syncDatabase" + $localStorage.UserId);
+                sync(Server.CouchDevelopment + $localStorage.UserId);
+                startListening();
+            });
+
+        });
       else
         $cordovaDialogs.alert('Senkronizasyon sırasında ana sunucuya bağlanamadı. Lütfen tekrar deneyin.', 'Sunucu Hatası!', 'Tamam');
 

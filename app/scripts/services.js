@@ -4,18 +4,6 @@ angular.module('starter.services', [])
     template: '<ion-spinner></ion-spinner><br/>Lütfen Bekleyiniz...',
     number: 2000
   })
-  .constant('Server', {
-    Development : 'http://rlservice.telekurye.com.tr/',
-    Product: 'http://192.168.1.175/',
-    CouchDevelopment: 'http://couchdb.telekurye.com.tr:5984/db_',
-    CouchProduct: 'http://192.168.1.8:5984/db_'
-  })
-  /*.constant('Server', {
-   Product: 'http://rlservice.telekurye.com.tr/',
-   Development: 'http://192.168.1.175/',
-   CouchProduct: 'http://couchdb.telekurye.com.tr:5984/db_',
-   CouchDevelopment: 'http://192.168.1.35:5984/db_'
-   })*/
   /*.constant('Server', {
    Development : 'XXX',
    Product: 'XXX',
